@@ -27,6 +27,16 @@ class Blueprint
     protected $table;
 
     /**
+     * @var string
+     */
+    protected $module;
+
+    /**
+     * @var string
+     */
+    protected $morphToMany;
+
+    /**
      * @var \Illuminate\Support\Fluent[]
      */
     protected $columns = [];
@@ -52,23 +62,28 @@ class Blueprint
     protected $primaryKey;
 
     /**
-     * @var bool
-     */
-    protected $isView;
-
-    /**
      * Blueprint constructor.
      *
      * @param string $connection
      * @param string $schema
      * @param string $table
      */
-    public function __construct($connection, $schema, $table, $isView = false)
+    public function __construct($connection, $schema, $table, $extras = null)
     {
         $this->connection = $connection;
         $this->schema = $schema;
         $this->table = $table;
-        $this->isView = $isView;
+
+        if(count($extras) == 1){
+            $this->module = ($extras[0] != "" ? $extras[0] : "app");
+            $this->morphToMany = "none";
+        }elseif(count($extras) == 2){
+            $this->module = $extras[0];
+            $this->morphToMany = $extras[1];
+        }else{
+            $this->module = "app";
+            $this->morphToMany = "none";
+        }
     }
 
     /**
@@ -85,6 +100,18 @@ class Blueprint
     public function table()
     {
         return $this->table;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModuleName()
+    {
+        if(!file_exists('Modules/'.title_case($this->module))){
+            Artisan::call('module:make', [title_case($this->module)]);
+        }
+
+        return $this->module;
     }
 
     /**
@@ -245,7 +272,7 @@ class Blueprint
      *
      * @return array
      */
-    public function references(self $table)
+    public function references(Blueprint $table)
     {
         $references = [];
 
@@ -266,24 +293,17 @@ class Blueprint
      */
     public function isUniqueKey(Fluent $constraint)
     {
-        foreach ($this->unique as $index) {
+        $is = false;
 
-            // We only need to consider cases, when UNIQUE KEY is presented by only ONE column
-            if (count($index->columns) === 1 && isset($index->columns[0])) {
-                if (in_array($index->columns[0], $constraint->columns)) {
-                    return true;
-                }
+        foreach ($this->unique as $index) {
+            foreach ($index->columns as $column) {
+                $is &= in_array($column, $constraint->columns);
+            }
+            if ($is) {
+                return true;
             }
         }
 
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isView()
-    {
-        return $this->isView;
+        return $is;
     }
 }
