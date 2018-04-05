@@ -1,13 +1,13 @@
 <?php
 
-namespace Reliese\Coders;
+namespace Gesirdek\Coders;
 
-use Reliese\Support\Classify;
-use Reliese\Coders\Model\Config;
+use Gesirdek\Support\Classify;
+use Gesirdek\Coders\Model\Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
-use Reliese\Coders\Console\CodeModelsCommand;
-use Reliese\Coders\Model\Factory as ModelFactory;
+use Gesirdek\Coders\Console\CodeModelsCommand;
+use Gesirdek\Coders\Model\Factory as ModelFactory;
 
 class CodersServiceProvider extends ServiceProvider
 {
