@@ -5,16 +5,16 @@
  * Date: 11/09/16 09:26 PM.
  */
 
-namespace Reliese\Coders\Model\Relations;
+namespace Gesirdek\Coders\Model\Relations;
 
 use Illuminate\Support\Fluent;
-use Reliese\Coders\Model\Model;
-use Reliese\Coders\Model\Relation;
+use Gesirdek\Coders\Model\Model;
+use Gesirdek\Coders\Model\Relation;
 
 class HasOneOrManyStrategy implements Relation
 {
     /**
-     * @var \Reliese\Coders\Model\Relation
+     * @var \Gesirdek\Coders\Model\Relation
      */
     protected $relation;
 
@@ -22,8 +22,8 @@ class HasOneOrManyStrategy implements Relation
      * HasManyWriter constructor.
      *
      * @param \Illuminate\Support\Fluent $command
-     * @param \Reliese\Coders\Model\Model $parent
-     * @param \Reliese\Coders\Model\Model $related
+     * @param \Gesirdek\Coders\Model\Model $parent
+     * @param \Gesirdek\Coders\Model\Model $related
      */
     public function __construct(Fluent $command, Model $parent, Model $related)
     {

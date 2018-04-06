@@ -5,7 +5,7 @@
  * Date: 18/09/16 08:19 PM.
  */
 
-namespace Reliese\Meta;
+namespace Gesirdek\Meta;
 
 use Illuminate\Support\Fluent;
 
@@ -268,7 +268,7 @@ class Blueprint
     }
 
     /**
-     * @param \Reliese\Meta\Blueprint $table
+     * @param \Gesirdek\Meta\Blueprint $table
      *
      * @return array
      */

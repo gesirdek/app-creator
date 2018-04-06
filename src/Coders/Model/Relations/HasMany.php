@@ -5,7 +5,7 @@
  * Date: 11/09/16 09:26 PM.
  */
 
-namespace Reliese\Coders\Model\Relations;
+namespace Gesirdek\Coders\Model\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;

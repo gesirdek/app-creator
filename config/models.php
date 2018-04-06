@@ -68,8 +68,8 @@ return [
         */
 
         'use' => [
-            // Reliese\Database\Eloquent\BitBooleans::class,
-            // Reliese\Database\Eloquent\BlamableBehavior::class,
+            // Gesirdek\Database\Eloquent\BitBooleans::class,
+            // Gesirdek\Database\Eloquent\BlamableBehavior::class,
         ],
 
         /*
@@ -407,7 +407,7 @@ return [
     //     'snake_attributes' => false,
     //     'qualified_tables' => true,
     //     'use' => [
-    //         Reliese\Database\Eloquent\BitBooleans::class,
+    //         Gesirdek\Database\Eloquent\BitBooleans::class,
     //     ],
     //     'except' => ['migrations'],
     //     'only' => ['users'],

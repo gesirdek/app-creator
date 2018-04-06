@@ -1,9 +1,9 @@
 <?php
 
-namespace Reliese\Meta\PgSQL;
+namespace Gesirdek\Meta\PgSQL;
 
 use Illuminate\Support\Arr;
-use Reliese\Meta\Blueprint;
+use Gesirdek\Meta\Blueprint;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 
@@ -11,7 +11,7 @@ use Illuminate\Database\Connection;
  * Created by Cristian.
  * Date: 18/09/16 06:50 PM.
  */
-class Schema implements \Reliese\Meta\Schema
+class Schema implements \Gesirdek\Meta\Schema
 {
     /**
      * @var string
@@ -29,7 +29,7 @@ class Schema implements \Reliese\Meta\Schema
     protected $loaded = false;
 
     /**
-     * @var \Reliese\Meta\Blueprint[]
+     * @var \Gesirdek\Meta\Blueprint[]
      */
     protected $tables = [];
 
@@ -97,7 +97,7 @@ class Schema implements \Reliese\Meta\Schema
     }
 
     /**
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      */
     protected function fillColumns(Blueprint $blueprint)
     {
@@ -121,7 +121,7 @@ class Schema implements \Reliese\Meta\Schema
     }
 
     /**
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      */
     protected function fillConstraints(Blueprint $blueprint)
     {
@@ -227,7 +227,7 @@ WHERE c.relkind = \'r\'::char
 
     /**
      * @param string $sql
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      * @todo: Support named primary keys
      */
     protected function fillPrimaryKey($columnNames, Blueprint $blueprint)
@@ -243,7 +243,7 @@ WHERE c.relkind = \'r\'::char
 
     /**
      * @param string $sql
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      */
     protected function fillIndexes($columnNames, Blueprint $blueprint)
     {
@@ -257,7 +257,7 @@ WHERE c.relkind = \'r\'::char
 
     /**
      * @param string $sql
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      * @todo: Support named foreign keys
      */
     protected function fillRelations($columnNames, $tableNames, $referenceids, Blueprint $blueprint)
@@ -321,7 +321,7 @@ WHERE c.relkind = \'r\'::char
 
     /**
      * @param string $table
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      *
      * @return array
      */
@@ -378,7 +378,7 @@ WHERE c.relkind = \'r\'::char
     }
 
     /**
-     * @return \Reliese\Meta\Blueprint[]
+     * @return \Gesirdek\Meta\Blueprint[]
      */
     public function tables()
     {
@@ -388,7 +388,7 @@ WHERE c.relkind = \'r\'::char
     /**
      * @param string $table
      *
-     * @return \Reliese\Meta\Blueprint
+     * @return \Gesirdek\Meta\Blueprint
      */
     public function table($table)
     {
@@ -408,7 +408,7 @@ WHERE c.relkind = \'r\'::char
     }
 
     /**
-     * @param \Reliese\Meta\Blueprint $table
+     * @param \Gesirdek\Meta\Blueprint $table
      *
      * @return array
      */

@@ -5,9 +5,9 @@
  * Date: 10/10/16 11:46 PM.
  */
 
-namespace Reliese\Coders\Model;
+namespace Gesirdek\Coders\Model;
 
-use Reliese\Meta\Blueprint;
+use Gesirdek\Meta\Blueprint;
 
 class Mutator
 {
@@ -40,7 +40,7 @@ class Mutator
 
     /**
      * @param string $column
-     * @param \Reliese\Meta\Blueprint $blueprint
+     * @param \Gesirdek\Meta\Blueprint $blueprint
      *
      * @return mixed
      */
@@ -63,7 +63,7 @@ class Mutator
 
     /**
      * @param string $attribute
-     * @param \Reliese\Coders\Model\Model $model
+     * @param \Gesirdek\Coders\Model\Model $model
      *
      * @return string
      */
@@ -86,7 +86,7 @@ class Mutator
 
     /**
      * @param string $attribute
-     * @param \Reliese\Coders\Model\Model $model
+     * @param \Gesirdek\Coders\Model\Model $model
      *
      * @return string
      */

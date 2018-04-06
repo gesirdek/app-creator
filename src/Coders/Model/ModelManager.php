@@ -5,7 +5,7 @@
  * Date: 02/10/16 08:24 PM.
  */
 
-namespace Reliese\Coders\Model;
+namespace Gesirdek\Coders\Model;
 
 use ArrayIterator;
 use IteratorAggregate;
@@ -14,19 +14,19 @@ use Illuminate\Support\Arr;
 class ModelManager implements IteratorAggregate
 {
     /**
-     * @var \Reliese\Coders\Model\Factory
+     * @var \Gesirdek\Coders\Model\Factory
      */
     protected $factory;
 
     /**
-     * @var \Reliese\Coders\Model\Model[]
+     * @var \Gesirdek\Coders\Model\Model[]
      */
     protected $models = [];
 
     /**
      * ModelManager constructor.
      *
-     * @param \Reliese\Coders\Model\Factory $factory
+     * @param \Gesirdek\Coders\Model\Factory $factory
      */
     public function __construct(Factory $factory)
     {
@@ -36,10 +36,10 @@ class ModelManager implements IteratorAggregate
     /**
      * @param string $schema
      * @param string $table
-     * @param \Reliese\Coders\Model\Mutator[] $mutators
+     * @param \Gesirdek\Coders\Model\Mutator[] $mutators
      * @param bool $withRelations
      *
-     * @return \Reliese\Coders\Model\Model
+     * @return \Gesirdek\Coders\Model\Model
      */
     public function make($schema, $table, $mutators = [], $withRelations = true)
     {

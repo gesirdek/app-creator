@@ -5,7 +5,7 @@
  * Date: 02/10/16 11:06 PM.
  */
 
-namespace Reliese\Meta;
+namespace Gesirdek\Meta;
 
 interface Column
 {

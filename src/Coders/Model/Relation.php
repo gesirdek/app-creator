@@ -5,7 +5,7 @@
  * Date: 05/09/16 11:27 PM.
  */
 
-namespace Reliese\Coders\Model;
+namespace Gesirdek\Coders\Model;
 
 interface Relation
 {

@@ -5,7 +5,7 @@
  * Date: 02/10/16 07:37 PM.
  */
 
-namespace Reliese\Meta;
+namespace Gesirdek\Meta;
 
 use ArrayIterator;
 use RuntimeException;
@@ -13,8 +13,8 @@ use IteratorAggregate;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\ConnectionInterface;
-use Reliese\Meta\MySql\Schema as MySqlSchema;
-use Reliese\Meta\PgSql\Schema as PgSqlSchema;
+use Gesirdek\Meta\MySql\Schema as MySqlSchema;
+use Gesirdek\Meta\PgSql\Schema as PgSqlSchema;
 
 class SchemaManager implements IteratorAggregate
 {
@@ -32,7 +32,7 @@ class SchemaManager implements IteratorAggregate
     private $connection;
 
     /**
-     * @var \Reliese\Meta\Schema[]
+     * @var \Gesirdek\Meta\Schema[]
      */
     protected $schemas = [];
 
@@ -66,7 +66,7 @@ class SchemaManager implements IteratorAggregate
     /**
      * @param string $schema
      *
-     * @return \Reliese\Meta\Schema
+     * @return \Gesirdek\Meta\Schema
      */
     public function make($schema)
     {
@@ -80,7 +80,7 @@ class SchemaManager implements IteratorAggregate
     /**
      * @param string $schema
      *
-     * @return \Reliese\Meta\Schema
+     * @return \Gesirdek\Meta\Schema
      */
     protected function makeMapper($schema)
     {
