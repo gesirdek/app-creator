@@ -1,17 +1,16 @@
 {
-    "name": "reliese/laravel",
-    "description": "Reliese Components for Laravel Framework code generation.",
-    "keywords": ["reliese", "laravel"],
-    "homepage": "http://cristianllanos.com",
+    "name": "gesirdek/app-creator",
+    "description": "Laravel Framework code generation.",
+    "keywords": ["gesirdek", "app-creator"],
     "support": {
-        "issues": "https://github.com/reliese/laravel/issues",
-        "source": "https://github.com/reliese/laravel"
+        "issues": "https://github.com/gesirdek/app-creator/issues",
+        "source": "https://github.com/gesirdek/app-creator"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": "Cristian Llanos",
-            "email": "cristianllanos@outlook.com"
+            "name": "Ertan Çoban",
+            "email": "cobanertan@gmail.com"
         }
     ],
     "require": {
@@ -30,7 +29,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Reliese\\": "src/"
+            "AppCreator\\": "src/"
         }
     },
     "autoload-dev": {
@@ -44,7 +43,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Reliese\\Coders\\CodersServiceProvider"
+                "AppCreator\\Coders\\CodersServiceProvider"
             ]
         }
     }
