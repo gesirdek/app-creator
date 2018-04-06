@@ -63,11 +63,10 @@ class Schema implements \Reliese\Meta\Schema
     {
         $tables = $this->fetchTables($this->schema);
         foreach ($tables as $table) {
-            $this->loadTable($table);
-        }
-        $views = $this->fetchViews($this->schema);
-        foreach ($views as $table) {
-            $this->loadTable($table, true);
+            $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table);
+            $this->fillColumns($blueprint);
+            $this->fillConstraints($blueprint);
+            $this->tables[$table] = $blueprint;
         }
     }
 
@@ -79,19 +78,6 @@ class Schema implements \Reliese\Meta\Schema
     protected function fetchTables($schema)
     {
         $rows = $this->arraify($this->connection->select('SHOW FULL TABLES FROM '.$this->wrap($schema).' WHERE Table_type="BASE TABLE"'));
-        $names = array_column($rows, 'Tables_in_'.$schema);
-
-        return Arr::flatten($names);
-    }
-
-    /**
-     * @param string $schema
-     *
-     * @return array
-     */
-    protected function fetchViews($schema)
-    {
-        $rows = $this->arraify($this->connection->select('SHOW FULL TABLES FROM '.$this->wrap($schema).' WHERE Table_type="VIEW"'));
         $names = array_column($rows, 'Tables_in_'.$schema);
 
         return Arr::flatten($names);
@@ -127,7 +113,7 @@ class Schema implements \Reliese\Meta\Schema
     {
         $row = $this->arraify($this->connection->select('SHOW CREATE TABLE '.$this->wrap($blueprint->qualifiedTable())));
         $row = array_change_key_case($row[0]);
-        $sql = ($blueprint->isView() ? $row['create view'] : $row['create table']);
+        $sql = $row['create table'];
         $sql = str_replace('`', '', $sql);
 
         $this->fillPrimaryKey($sql, $blueprint);
@@ -347,17 +333,5 @@ class Schema implements \Reliese\Meta\Schema
         }
 
         return $references;
-    }
-
-    /**
-     * @param string $table
-     * @param bool $isView
-     */
-    protected function loadTable($table, $isView = false)
-    {
-        $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, $isView);
-        $this->fillColumns($blueprint);
-        $this->fillConstraints($blueprint);
-        $this->tables[$table] = $blueprint;
     }
 }

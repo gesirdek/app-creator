@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Reliese Test Suite">
+        <testsuite name="App Creator Test Suite">
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>

@@ -11,10 +11,10 @@ use ArrayIterator;
 use RuntimeException;
 use IteratorAggregate;
 use Illuminate\Database\MySqlConnection;
-use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\ConnectionInterface;
 use Reliese\Meta\MySql\Schema as MySqlSchema;
-use Reliese\Meta\Sqlite\Schema as SqliteSchema;
+use Reliese\Meta\PgSql\Schema as PgSqlSchema;
 
 class SchemaManager implements IteratorAggregate
 {
@@ -23,7 +23,7 @@ class SchemaManager implements IteratorAggregate
      */
     protected static $lookup = [
         MySqlConnection::class => MySqlSchema::class,
-        SQLiteConnection::class => SqliteSchema::class,
+        PostgresConnection::class => PgSqlSchema::class,
     ];
 
     /**
@@ -57,7 +57,7 @@ class SchemaManager implements IteratorAggregate
         }
 
         $schemas = forward_static_call([$this->getMapper(), 'schemas'], $this->connection);
-
+        
         foreach ($schemas as $schema) {
             $this->make($schema);
         }

@@ -1,4 +1,4 @@
-# Reliese Laravel
+# App-Creator
 
 [![StyleCI](https://styleci.io/repos/71080508/shield?style=flat)](https://styleci.io/repos/71080508)
 [![Build Status](https://travis-ci.org/reliese/laravel.svg?branch=master)](https://travis-ci.org/reliese/laravel)
@@ -7,17 +7,16 @@
 [![Latest Unstable Version](https://poser.pugx.org/reliese/laravel/v/unstable)](https://packagist.org/packages/reliese/laravel)
 [![License](https://poser.pugx.org/reliese/laravel/license)](https://packagist.org/packages/reliese/laravel)
 
-Reliese Laravel is a collection of Laravel Components which aim is 
-to help the development process of Laravel applications by 
-providing some convenient code-generation capabilities.
+App-Creator is a collection of Laravel Components which aim is 
+to create Laravel 5.6 application from database.
 
 ## How does it work?
 
-This package expects that you are using Laravel 5.1 or above.
-You will need to import the `reliese/laravel` package via composer:
+This package expects that you are using Laravel 5.6.
+You will need to import the `app-creator` package via composer:
 
 ```shell
-composer require reliese/laravel
+composer require gesirdek/app-creator
 ```
 
 ### Configuration
@@ -31,7 +30,7 @@ Add the service provider to your `config/app.php` file within the `providers` ke
      * Package Service Providers...
      */
 
-    Reliese\Coders\CodersServiceProvider::class,
+    AppCreator\Coders\CodersServiceProvider::class,
 ],
 // ...
 ```
@@ -40,7 +39,7 @@ Add the service provider to your `config/app.php` file within the `providers` ke
 If you wish to enable generators only for your local environment, you should install it via composer using the --dev option like this:
 
 ```shell
-composer require reliese/laravel --dev
+composer require app-creator --dev
 ```
 
 Then you'll need to register the provider in `app/Providers/AppServiceProvider.php` file.
@@ -49,20 +48,17 @@ Then you'll need to register the provider in `app/Providers/AppServiceProvider.p
 public function register()
 {
     if ($this->app->environment() == 'local') {
-        $this->app->register(\Reliese\Coders\CodersServiceProvider::class);
+        $this->app->register(AppCreator\Coders\CodersServiceProvider::class);
     }
 }
 ```
 
 ## Models
 
-![Generating models with artisan](https://cdn-images-1.medium.com/max/800/1*hOa2QxORE2zyO_-ZqJ40sA.png "Making artisan code my Eloquent models")
-
-Add the `models.php` configuration file to your `config` directory and clear the config cache:
+Add the `models.php` configuration file to your `config` directory:
 
 ```shell
 php artisan vendor:publish --tag=reliese-models
-php artisan config:clear
 ```
 
 ### Usage
@@ -93,6 +89,15 @@ php artisan code:models --connection=mysql
 php artisan code:models --schema=shop
 ```
 
+### Database Creation
+
+Tested only on Postgre.
+
+To be able to create project from database, consider below for database design.
+- table names needs to be plural except pivot tables.
+- pivot tables include both tables.
+- To implement moduler design, add module name to table comment 
+
 ### Customizing Model Scaffolding
 
 To change the scaffolding behaviour you can make `config/models.php` configuration file
@@ -109,10 +114,10 @@ When you enable this feature your models will inherit their base configurations 
 base models. You should avoid adding code to your base models, since you
 will lose all changes when they are generated again.
 
-> Note: You will end up with two models for the same table and you may think it is a horrible idea 
+> Note: You will end up with to models for the same table and you may think it is a horrible idea 
 to have two classes for the same thing. However, it is up to you
 to decide whether this approach gives value to your project :-)
 
 #### Support
 
-For the time being, this package only supports MySQL databases. Support for other databases will be added soon.
+For the time being, this package supports Postgre database. MySQL model and schema is ready but never tested.
