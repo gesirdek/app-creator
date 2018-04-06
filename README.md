@@ -1,14 +1,7 @@
 # App-Creator
 
-[![StyleCI](https://styleci.io/repos/71080508/shield?style=flat)](https://styleci.io/repos/71080508)
-[![Build Status](https://travis-ci.org/reliese/laravel.svg?branch=master)](https://travis-ci.org/reliese/laravel)
-[![Latest Stable Version](https://poser.pugx.org/reliese/laravel/v/stable)](https://packagist.org/packages/reliese/laravel)
-[![Total Downloads](https://poser.pugx.org/reliese/laravel/downloads)](https://packagist.org/packages/reliese/laravel)
-[![Latest Unstable Version](https://poser.pugx.org/reliese/laravel/v/unstable)](https://packagist.org/packages/reliese/laravel)
-[![License](https://poser.pugx.org/reliese/laravel/license)](https://packagist.org/packages/reliese/laravel)
-
 App-Creator is a collection of Laravel Components which aim is 
-to create Laravel 5.6 application from database.
+to create Laravel 5.6 and Vue2 application from database.
 
 ## How does it work?
 
@@ -55,11 +48,7 @@ public function register()
 
 ## Models
 
-Add the `models.php` configuration file to your `config` directory:
-
-```shell
-php artisan vendor:publish --tag=reliese-models
-```
+Add the `models.php` configuration file to your `config` directory.
 
 ### Usage
 
@@ -68,25 +57,7 @@ Assuming you have already configured your database, you are now all set to go.
 - Let's scaffold some of your models from your default connection.
 
 ```shell
-php artisan code:models
-```
-
-- You can scaffold a specific table like this:
-
-```shell
-php artisan code:models --table=users
-```
-
-- You can also specify the connection:
-
-```shell
-php artisan code:models --connection=mysql
-```
-
-- If you are using a MySQL database, you can specify which schema you want to scaffold:
-
-```shell
-php artisan code:models --schema=shop
+php artisan code:models --connection=pgsql --schema=shop
 ```
 
 ### Database Creation
@@ -94,14 +65,15 @@ php artisan code:models --schema=shop
 Tested only on Postgre.
 
 To be able to create project from database, consider below for database design.
-- table names needs to be plural except pivot tables.
-- pivot tables include both tables.
-- To implement moduler design, add module name to table comment 
+
+- Table names need to be plural form except pivot table names.
+- Pivot table names must include both tables' name as singular form.
+- To implement moduler design, add module name to table comment. If you need to add a comment to any table, add double semicolon (;;) before your comment.
 
 ### Customizing Model Scaffolding
 
 To change the scaffolding behaviour you can make `config/models.php` configuration file
-fit your database needs. [Check it out](https://github.com/reliese/laravel/blob/master/config/models.php) ;-)
+fit your database needs. 
 
 ### Tips
 
