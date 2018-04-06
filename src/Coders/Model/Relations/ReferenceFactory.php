@@ -63,17 +63,12 @@ class ReferenceFactory
     protected function hasPivot()
     {
         $pivot = $this->getRelatedBlueprint()->table();
-        $firstRecord = $this->parent->getRecordName();
 
         // See whether this potencial pivot table has the parent record name in it.
         // Not sure whether we should only take into account composite primary keys.
-        if (
-            ! Str::contains($pivot, $firstRecord)
-        ) {
+        if(str_singular($pivot) != $pivot){ //not pivot table
             return false;
         }
-
-        $pivot = str_replace($firstRecord, '', $pivot);
 
         foreach ($this->getRelatedBlueprint()->relations() as $reference) {
             if ($reference == $this->getRelatedReference()) {
