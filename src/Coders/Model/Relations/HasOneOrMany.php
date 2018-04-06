@@ -60,7 +60,7 @@ abstract class HasOneOrMany implements Relation
     {
         $body = 'return $this->'.$this->method().'(';
 
-        $body .= $this->related->getQualifiedUserClassName().'::class';
+        $body .= $this->related->getClassName().'::class';
 
         if ($this->needsForeignKey()) {
             $foreignKey = $this->parent->usesPropertyConstants()

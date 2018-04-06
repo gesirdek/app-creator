@@ -98,7 +98,7 @@ class BelongsToMany implements Relation
     {
         $body = 'return $this->belongsToMany(';
 
-        $body .= $this->reference->getQualifiedUserClassName().'::class';
+        $body .= $this->reference->getClassName().'::class';
 
         if ($this->needsPivotTable()) {
             $body .= ', '.Dumper::export($this->pivotTable());
@@ -108,17 +108,23 @@ class BelongsToMany implements Relation
             $foreignKey = $this->parent->usesPropertyConstants()
                 ? $this->reference->getQualifiedUserClassName().'::'.strtoupper($this->foreignKey())
                 : $this->foreignKey();
-            $body .= ', '.Dumper::export($foreignKey);
+
+            if($foreignKey != ''){
+                $body .= ', '.Dumper::export($foreignKey);
+            }
         }
 
         if ($this->needsOtherKey()) {
             $otherKey = $this->reference->usesPropertyConstants()
                 ? $this->reference->getQualifiedUserClassName().'::'.strtoupper($this->otherKey())
                 : $this->otherKey();
-            $body .= ', '.Dumper::export($otherKey);
+            if($otherKey != ''){
+                $body .= ', '.Dumper::export($otherKey);
+            }
         }
 
         $body .= ')';
+
 
         $fields = $this->getPivotFields();
 
@@ -203,6 +209,7 @@ class BelongsToMany implements Relation
             $this->pivot->getCreatedAtField(),
             $this->pivot->getUpdatedAtField(),
             $this->pivot->getDeletedAtField(),
+            $this->pivot->getPrimaryKey(),
         ]);
     }
 

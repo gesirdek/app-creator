@@ -172,17 +172,29 @@ class Model
      */
     public function __construct(Blueprint $blueprint, Factory $factory, $mutators = [], $loadRelations = true)
     {
+        $namespaces = [];
+        $namespaceMain = ($blueprint->getModuleName() == 'App' ? 'App' : 'Modules\\'.title_case($blueprint->getModuleName()));
+        $base = (title_case($blueprint->getModuleName()) == "App" ? "" : 'Modules');
+
+
+        $namespaces[] = $namespaceMain.'\\Entities'; //Model namespace
+        $namespaces[] = $namespaceMain.'\\Http\\Requests'; //Request namespace
+        $namespaces[] = $namespaceMain.'\\Http\\Controllers'; //Controller namespace
+
+
         $this->blueprint = $blueprint;
         $this->factory = $factory;
         $this->loadRelations = $loadRelations;
         $this->mutators = $mutators;
-        $this->configure();
+        $this->configure($namespaces);
         $this->fill();
     }
 
-    protected function configure()
+    protected function configure($namespaces)
     {
-        $this->withNamespace($this->config('namespace'));
+        $this->withNamespace($namespaces[0]);
+        $this->withRequestNamespace($namespaces[1]);
+        $this->withControllerNamespace($namespaces[2]);
         $this->withParentClass($this->config('parent'));
 
         // Timestamps settings

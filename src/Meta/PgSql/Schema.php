@@ -284,7 +284,7 @@ WHERE c.relkind = \'r\'::char
             $relation = [
                 'name' => 'foreign',
                 'index' => '',
-                'columns' => $this->columnize($combinedColumns[$index]),
+                'columns' => $this->columnize(substr($combinedColumns[$index],1)),
                 'references' => $this->columnize($combinedReferences[$index]),
                 'on' => $table,
             ];
