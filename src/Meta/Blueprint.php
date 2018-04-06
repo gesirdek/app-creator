@@ -7,6 +7,7 @@
 
 namespace Gesirdek\Meta;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Fluent;
 
 class Blueprint

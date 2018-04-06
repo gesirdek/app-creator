@@ -14,7 +14,7 @@ class CodeModelsCommand extends Command
      * @var string
      */
     protected $signature = 'code:models
-                            {--s|schema= : The name of the MySQL database}
+                            {--s|schema= : The name of the PgSQL database}
                             {--c|connection= : The name of the connection}
                             {--t|table= : The name of the table}';
 
@@ -66,7 +66,7 @@ class CodeModelsCommand extends Command
 
         // Otherwise map the whole database
         else {
-            $this->models->on($connection)->map($schema);
+            $this->models->on($connection, $schema)->map($schema);
             $this->info("Check out your models for $schema");
         }
     }

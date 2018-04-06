@@ -41,16 +41,16 @@ class SchemaManager implements IteratorAggregate
      *
      * @param \Illuminate\Database\ConnectionInterface $connection
      */
-    public function __construct(ConnectionInterface $connection)
+    public function __construct(ConnectionInterface $connection, $schema = '')
     {
         $this->connection = $connection;
-        $this->boot();
+        $this->boot($schema);
     }
 
     /**
      * Load all schemas from this connection.
      */
-    public function boot()
+    public function boot($schemac = '')
     {
         if (! $this->hasMapping()) {
             throw new RuntimeException("There is no Schema Mapper registered for [{$this->type()}] connection.");
@@ -59,7 +59,13 @@ class SchemaManager implements IteratorAggregate
         $schemas = forward_static_call([$this->getMapper(), 'schemas'], $this->connection);
         
         foreach ($schemas as $schema) {
-            $this->make($schema);
+            if($schemac != ''){
+                if($schema == $schemac){
+                    $this->make($schema);
+                }
+            }else{
+                $this->make($schema);
+            }
         }
     }
 

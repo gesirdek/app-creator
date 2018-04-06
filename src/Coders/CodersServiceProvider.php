@@ -26,7 +26,7 @@ class CodersServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../../config/models.php' => config_path('models.php'),
-            ], 'reliese-models');
+            ], 'gesirdek-models');
 
             $this->commands([
                 CodeModelsCommand::class,
