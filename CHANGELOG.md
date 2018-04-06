@@ -1,5 +1,8 @@
 # Release Notes
 
+## v0.1.13 (2018-04-06)
+- Controller, Requests, Models and Vue File creations added
+
 ## v0.0.13 (2017-02-04)
 
 ### Fixed
