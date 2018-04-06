@@ -1,0 +1,90 @@
+<template>
+  <div>
+    <h1>
+      {{ $t("{{vuefilenamelower}}.title") }}
+      <v-btn color="primary" slot="activator" @click.stop="dialog = !dialog">
+        <v-icon>add</v-icon>
+      </v-btn>
+    </h1>
+    <v-dialog v-model="dialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline" v-if="!item.id">{{ $t('{{vuefilenamelower}}.create_title') }}</span>
+          <span class="headline" v-if="item.id">{{ $t('{{vuefilenamelower}}.update_title') }}</span>
+        </v-card-title>
+        <form @submit.prevent="submit()">
+          <v-card-text>{{vuefields}}
+          </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn type="primary" color="primary" v-if="!item.id">{{ $t('{{vuefilenamelower}}.save') }}</v-btn>
+              <v-btn type="primary" color="primary" v-if="item.id">{{ $t('{{vuefilenamelower}}.update') }}</v-btn>
+            </v-card-actions>
+        </form>
+      </v-card>
+    </v-dialog>
+    <v-data-table
+            :headers="headers"
+            :items="items"
+            hide-actions
+            class="elevation-1"
+    >
+      <template slot="items" slot-scope="props">
+        {{props}}
+        <td class="justify-end layout px-0">
+            <v-btn icon class="mx-0" @click="editItem(props.item)">
+                <v-icon color="teal">edit</v-icon>
+            </v-btn>
+            <v-btn icon class="mx-0" @click="deleteConfirm(props.item)">
+                <v-icon color="pink">delete</v-icon>
+            </v-btn>
+        </td>
+      </template>
+    </v-data-table>
+    <Confirm @confirm="deleteItem" ref="confirm" message="{{vuefilenamelower}}.are_you_sure"></Confirm>
+  </div>
+</template>
+
+<script>
+import Crud from '~/mixins/Crud'
+import { loadComponentMessages } from '~/plugins/i18n'
+import store from '~/store'
+
+export default {
+  name: '{{vuefilename}}',
+  mixins:[Crud],
+  data () {
+    return {
+        {{lists}}
+        store:store
+    }
+  },
+    mounted(){
+      loadComponentMessages({
+          "{{vuefilenamelower}}":{
+              "tr":{
+                "title":"",
+                {{modelfields}}
+                "are_you_sure":"Emin misiniz?",
+                "create_title":"Oluştur",
+                "update_title":"Güncelle",
+                "save":"Kaydet",
+                "update":"Güncelle",
+              },
+              "en":{
+                "title":"",
+                {{modelfields}}
+                "are_you_sure":"Are you sure?",
+                "create_title":"Create",
+                "update_title":"Update",
+                "save":"Save",
+                "update":"Update",
+              }
+          }
+      });
+      this.setResource('/api/core/{{lowerclass}}',{ {{resources}} },
+      [{{resourcestwo}}],
+      [{{listdata}}]);
+    }
+}
+</script>

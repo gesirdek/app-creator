@@ -7,6 +7,7 @@
 
 namespace Reliese\Coders\Model;
 
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Reliese\Meta\Blueprint;
 use Reliese\Support\Classify;
@@ -50,7 +51,6 @@ class Factory
      * @var \Reliese\Coders\Model\Mutator[]
      */
     protected $mutators = [];
-
     /**
      * ModelsFactory constructor.
      *
@@ -113,8 +113,8 @@ class Factory
         $mapper = $this->makeSchema($schema);
 
         foreach ($mapper->tables() as $blueprint) {
-            if ($this->shouldTakeOnly($blueprint) && $this->shouldNotExclude($blueprint)) {
-                $this->create($mapper->schema(), $blueprint->table());
+            if ($this->shouldNotExclude($blueprint)) {
+                $this->create($mapper->schema(), $blueprint->table(), $blueprint->getModuleName());
             }
         }
     }
@@ -136,45 +136,52 @@ class Factory
     }
 
     /**
-     * @param \Reliese\Meta\Blueprint $blueprint
-     *
-     * @return bool
+     * @param string $schema
+     * @param string $table
      */
-    protected function shouldTakeOnly(Blueprint $blueprint)
+    public function create($schema, $table, $moduleName)
     {
-        if ($patterns = $this->config($blueprint, 'only', [])) {
-            foreach ($patterns as $pattern) {
-                if (Str::is($pattern, $blueprint->table())) {
-                    return true;
-                }
-            }
-
-            return false;
+        if(str_singular($table) == $table){ //pivot table shall not pass
+            return;
         }
 
-        return true;
+        $model = $this->makeModel($schema, $table);
+        $this->createFiles($model, title_case($moduleName));
     }
 
     /**
      * @param string $schema
      * @param string $table
      */
-    public function create($schema, $table)
+    public function createFiles($model, $moduleName)
     {
-        $model = $this->makeModel($schema, $table);
+        $namespaces = [];
+        $namespaceMain = ($moduleName == 'App' ? 'App' : 'Modules\\'.$moduleName);
+        $base = ($moduleName == "App" ? "" : 'Modules');
+
+
+        $namespaces[] = $namespaceMain.'\\Entities'; //Model namespace
+        $namespaces[] = $namespaceMain.'\\Http\\Requests'; //Request namespace
+        $namespaces[] = $namespaceMain.'\\Http\\Controllers'; //Controller namespace
+
         $template = $this->prepareTemplate($model, 'model');
+        $file = $this->fillTemplate($template, $model, $namespaces);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Entities'],'','.php'), $file);
 
-        $file = $this->fillTemplate($template, $model);
+        /*REQUEST MODELS*/
+        $template = $this->prepareTemplate($model, 'request_model');
+        $file = $this->fillTemplate($template, $model, $namespaces);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Http','Requests'],'','Request.php'), $file);
 
-        if ($model->indentWithSpace()) {
-            $file = str_replace("\t", str_repeat(' ', $model->indentWithSpace()), $file);
-        }
+        /*CONTROLLERS*/
+        $template = $this->prepareTemplate($model, 'controller_model');
+        $file = $this->fillTemplate($template, $model, $namespaces);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Http','Controllers'],'','Controller.php'), $file);
 
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : []), $file);
-
-        if ($this->needsUserFile($model)) {
-            $this->createUserFile($model);
-        }
+        /*VUE MODELS - FRONT-END*/
+        $template = $this->prepareTemplate($model, 'vue_model');
+        $file = $this->fillTemplate($template, $model, $namespaces);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == 'App' ? '' : $moduleName),($moduleName == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleName == 'App' ? '' : $moduleName),'.vue'), $file);
     }
 
     /**
@@ -202,7 +209,6 @@ class Factory
 
     /**
      * @param \Reliese\Coders\Model\Model $model
-     *
      * @todo: Delegate workload to SchemaManager and ModelManager
      *
      * @return array
@@ -220,8 +226,8 @@ class Factory
         foreach ($references as &$related) {
             $blueprint = $related['blueprint'];
             $related['model'] = $model->getBlueprint()->is($blueprint->schema(), $blueprint->table())
-                ? $model
-                : $this->makeModel($blueprint->schema(), $blueprint->table(), false);
+                                ? $model
+                                : $this->makeModel($blueprint->schema(), $blueprint->table(), false);
         }
 
         return $references;
@@ -232,7 +238,6 @@ class Factory
      * @param string $name
      *
      * @return string
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function prepareTemplate(Model $model, $name)
     {
@@ -248,80 +253,312 @@ class Factory
      *
      * @return mixed
      */
-    protected function fillTemplate($template, Model $model)
+    protected function fillTemplate($template, Model $model, $namespaces)
     {
-        $template = str_replace('{{namespace}}', $model->getBaseNamespace(), $template);
+        $template = str_replace('{{date}}', Carbon::now()->toRssString(), $template);
+
+        /*if($model->getTable() == "balance_types"){
+            dd($namespaces);
+        }*/
+        $template = str_replace('{{namespacemodel}}', $namespaces[0], $template);
+        $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
+        $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
+
+        $template = str_replace('{{vuefilename}}', 'Core'.$model->getClassName(), $template);
+        $template = str_replace('{{vuefilenamelower}}', 'core'.str_replace('_','', str_singular($model->getTable())), $template);
+        $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
+        $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
+        $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
+        $template = str_replace('{{props}}', $this->getVueModelProps($model), $template);
+        $template = str_replace('{{vuefields}}', $this->getVueFields($model), $template);
+        $template = str_replace('{{lists}}', $this->getVueLists($model), $template);
+        $template = str_replace('{{listdata}}', $this->getVueListData($model), $template);
+        $template = str_replace('{{lowerclass}}', str_replace('_','-', str_singular($model->getTable())), $template);
+
+        $template = str_replace('{{parent}}', $model->getParentClass(), $template);
+        $template = str_replace('{{rules}}', $this->getRules($model), $template);
+        $template = str_replace('{{updatemodel}}', $this->getUpdateModel($model), $template);
+        $template = str_replace('{{storemodel}}', $this->getStoreModel($model), $template);
+        $template = str_replace('{{properties}}', $this->properties($model), $template);
         $template = str_replace('{{class}}', $model->getClassName(), $template);
-
-        $properties = $this->properties($model);
-        $usedClasses = $this->extractUsedClasses($properties);
-        $template = str_replace('{{properties}}', $properties, $template);
-
-        $parentClass = $model->getParentClass();
-        $usedClasses = array_merge($usedClasses, $this->extractUsedClasses($parentClass));
-        $template = str_replace('{{parent}}', $parentClass, $template);
-
-        $body = $this->body($model);
-        $usedClasses = array_merge($usedClasses, $this->extractUsedClasses($body));
-        $template = str_replace('{{body}}', $body, $template);
-
-        $usedClasses = array_unique($usedClasses);
-        $usedClassesSection = $this->formatUsedClasses(
-            $model->getBaseNamespace(),
-            $usedClasses
-        );
-        $template = str_replace('{{imports}}', $usedClassesSection, $template);
+        $template = str_replace('{{body}}', $this->body($model), $template);
 
         return $template;
     }
 
     /**
-     * Returns imports section for model.
+     * @param \Reliese\Coders\Model\Model $model
      *
-     * @param string $baseNamespace base namespace to avoid importing classes from same namespace
-     * @param array $usedClasses Array of used in model classes
-     *
-     * @return string
+     * @return mixed
      */
-    private function formatUsedClasses($baseNamespace, $usedClasses)
-    {
-        $result = [];
-        foreach ($usedClasses as $usedClass) {
-            // Do not import classes from same namespace
-            $namespacePattern = str_replace('\\', '\\\\', "/{$baseNamespace}\\[a-zA-Z0-9_]*/");
-            if (! preg_match($namespacePattern, $usedClass)) {
-                $result[] = "use {$usedClass};";
+    protected function getVueListData(Model $model){
+        $body = "";
+
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                if(str_is('*_id',$property)){
+                    $body.= '{list:\''.substr($property,0,-2).'list\',source:\'/api/core/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                }
             }
         }
 
-        sort($result);
-
-        return implode("\n", $result);
+        return $body;
     }
 
     /**
-     * Extract and replace fully-qualified class names from placeholder.
+     * @param \Reliese\Coders\Model\Model $model
      *
-     * @param string $placeholder Placeholder to extract class names from. Rewrites value to content without FQN
-     *
-     * @return array Extracted FQN
+     * @return mixed
      */
-    private function extractUsedClasses(&$placeholder)
-    {
-        $classNamespaceRegExp = '/([\\\\a-zA-Z0-9_]*\\\\[\\\\a-zA-Z0-9_]*)/';
-        $matches = [];
-        $usedInModelClasses = [];
-        if (preg_match_all($classNamespaceRegExp, $placeholder, $matches)) {
-            foreach ($matches[1] as $match) {
-                $usedClassName = $match;
-                $usedInModelClasses[] = trim($usedClassName, '\\');
-                $namespaceParts = explode('\\', $usedClassName);
-                $resultClassName = array_pop($namespaceParts);
-                $placeholder = str_replace($usedClassName, $resultClassName, $placeholder);
+    protected function getVueLists(Model $model){
+        $body = "";
+
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                if(str_is('*_id',$property)){
+                    $body.= "\t\t".substr($property,0,-2).'list : [],'."\r\n";
+                }
             }
         }
 
-        return array_unique($usedInModelClasses);
+        return substr(substr($body,2),0,-2);
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueFields(Model $model){
+        $body = "\r\n";
+        $vfilename = 'core'.str_replace('_','', str_singular($model->getTable()));
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                if(str_is('*_id',$property)){
+                    $body .= "\t\t\t".'<v-select'."\r\n";
+                    $body .= "\t\t\t\t".':items="'.substr($property,0,-2).'list"'."\r\n";
+                    $body .= "\t\t\t\t".'item-text="name"'."\r\n";
+                    $body .= "\t\t\t\t".'item-value="id"'."\r\n";
+                    $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+                    $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".':counter="255"'."\r\n";
+                    $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
+                    $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'required'."\r\n";
+                    $body .= "\t\t\t".'></v-select>'."\r\n";
+                }else if($dataType == 'boolean'){
+                    $body .= "\t\t\t".'<v-checkbox'."\r\n";
+                    $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+                    $body .= "\t\t\t\t".'value="1"'."\r\n";
+                    $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
+                    $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'type="checkbox"'."\r\n";
+                    $body .= "\t\t\t\t".'required'."\r\n";
+                    $body .= "\t\t\t".'></v-checkbox>'."\r\n";
+                }/*else if($dataType == 'file'){
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required|file\','."\n";
+                }else if($dataType == 'integer'){
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required|integer\','."\n";
+                }*/else if($dataType == '\Carbon\Carbon') {
+                    $body .= "\t\t\t".'<v-date-picker'."\r\n";
+                    $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+                    $body .= "\t\t\t\t".':locale="store.getters.locale"'."\r\n";
+                    $body .= "\t\t\t".'></v-date-picker>'."\r\n";
+                }else if($dataType == 'string') {
+                    $body .= "\t\t\t".'<v-text-field'."\r\n";
+                    $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+                    $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".':counter="'.$model->getBlueprint()->column($property)->getAttributes()['size'].'"'."\r\n";
+                    $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'v-validate="\'required|max:'.$model->getBlueprint()->column($property)->getAttributes()['size'].'\'"'."\r\n";
+                    $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'required'."\r\n";
+                    $body .= "\t\t\t".'></v-text-field>'."\r\n";
+                }else{
+                    $body .= "\t\t\t".'<v-text-field'."\r\n";
+                    $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+                    $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".':counter="255"'."\r\n";
+                    $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
+                    $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
+                    $body .= "\t\t\t\t".'required'."\r\n";
+                    $body .= "\t\t\t".'></v-text-field>'."\r\n";
+                }
+            }
+        }
+
+        return $body;
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueModelProps(Model $model){
+        $body = '';
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                if(Str::contains($property,'_id')){
+                    $body .= "\t\t".'<td>{{ '.substr($property,0,-2).'list.filter(function( a ) { return a.id === props.item.'.$property.'; })[0].name }}</td>'."\r\n";
+                }else{
+                    $body .= "\t\t".'<td>{{ props.item.'.$property.' }}</td>'."\r\n";
+                }
+
+
+            }
+        }
+
+        return substr($body,2);
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueModelResourcesTwo(Model $model){
+        $body = '';
+        $vfilename = 'core'.str_replace('_','', str_singular($model->getTable()));
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                $body .='"'.$vfilename.'.'.$property.'", ';
+            }
+        }
+
+        return $body;
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueModelResources(Model $model){
+        $body = '';
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                $body .= $property.':\'\',';
+            }
+        }
+
+        return $body;
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueModelFields(Model $model){
+        $body = "";
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                $body .="\t\t\t\t".'"'.$property.'":\''.title_case(str_replace('_',' ',str_replace('_id','',$property))).'\','."\r\n";
+            }
+        }
+
+        return substr(substr($body,4),0,-2);
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getRules(Model $model){
+        $body = "";
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                if(str_is('*_id',$property)){
+                    if(str_contains($property, "parent_id")){
+                        $body .= "\t\t\t".'\''.$property.'\'=>\'required|exists:'.$model->getTable().',id\','."\n";
+                    }else{
+                        $body .= "\t\t\t".'\''.$property.'\'=>\'required|exists:'.str_plural(str_before($property,'_id')).',id\','."\n";
+                    }
+                }else if($dataType == 'boolean'){
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required|boolean\','."\n";
+                }else if($dataType == 'file'){
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required|file\','."\n";
+                }else if($dataType == 'integer'){
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required|integer\','."\n";
+                }else if($dataType == 'string'){
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required|max:'.$model->getBlueprint()->column($property)->getAttributes()['size'].'\','."\n";
+                }else{
+                    $body .= "\t\t\t".'\''.$property.'\'=>\'required\','."\n";
+                }
+            }
+        }
+
+        return substr(substr($body,0,-2), 3);
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getUpdateModel(Model $model){
+        $body = '$model_id = DB::transaction(function () use ($request, $id) {'."\n";
+        $body .= "\t\t\t".'$model = '.$model->getClassName().'::find($id);'."\n";
+
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                switch ($dataType){
+                    case 'file': $body .= "\t\t\t".'$model->'.$property.' = $request->file(\''.$property.'\');'."\n"; break;
+                    default: $body .= "\t\t\t".'$model->'.$property.' = $request->get(\''.$property.'\');'."\n";
+                }
+            }
+        }
+        $body .= "\t\t\t".'$model->save();'."\n\n";
+        $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
+            }
+        }
+        $body .= "\n";
+        $body .= "\t\t\t".'return $model->id;'."\n";
+        $body .= "\t\t".'});'."\n";
+        $body .= "\t\t".'return $model_id;';
+
+        return $body;
+    }
+
+    /**
+     * @param \Reliese\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getStoreModel(Model $model){
+        $body = '$model_id = DB::transaction(function () use ($request) {'."\n";
+        $body .= "\t\t\t".'$model = new '.$model->getClassName().';'."\n";
+
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                switch ($dataType){
+                    case 'file': $body .= "\t\t\t".'$model->'.$property.' = $request->file(\''.$property.'\');'."\n"; break;
+                    default: $body .= "\t\t\t".'$model->'.$property.' = $request->get(\''.$property.'\');'."\n";
+                }
+            }
+        }
+        $body .= "\t\t\t".'$model->save();'."\n\n";
+        $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
+            }
+        }
+        $body .= "\n";
+        $body .= "\t\t\t".'return $model->id;'."\n";
+        $body .= "\t\t".'});'."\n";
+        $body .= "\t\t".'return $model_id;';
+
+        return $body;
     }
 
     /**
@@ -367,31 +604,16 @@ class Factory
             $body .= $this->class->mixin($trait);
         }
 
-        $excludedConstants = [];
-
         if ($model->hasCustomCreatedAtField()) {
             $body .= $this->class->constant('CREATED_AT', $model->getCreatedAtField());
-            $excludedConstants[] = $model->getCreatedAtField();
         }
 
         if ($model->hasCustomUpdatedAtField()) {
             $body .= $this->class->constant('UPDATED_AT', $model->getUpdatedAtField());
-            $excludedConstants[] = $model->getUpdatedAtField();
         }
 
         if ($model->hasCustomDeletedAtField()) {
             $body .= $this->class->constant('DELETED_AT', $model->getDeletedAtField());
-            $excludedConstants[] = $model->getDeletedAtField();
-        }
-
-        if ($model->usesPropertyConstants()) {
-            // Take all properties and exclude already added constants with timestamps.
-            $properties = array_keys($model->getProperties());
-            $properties = array_diff($properties, $excludedConstants);
-
-            foreach ($properties as $property) {
-                $body .= $this->class->constant(strtoupper($property), $property);
-            }
         }
 
         $body = trim($body, "\n");
@@ -425,6 +647,9 @@ class Factory
         if (! $model->usesTimestamps()) {
             $body .= $this->class->field('timestamps', false, ['visibility' => 'public']);
         }
+        /*else{
+            $body .= "\n\t".'protected $dateFormat = \'Y-m-d H:i:sO\';'."\n";
+        }*/
 
         if ($model->hasCustomDateFormat()) {
             $body .= $this->class->field('dateFormat', $model->getDateFormat());
@@ -470,11 +695,12 @@ class Factory
 
     /**
      * @param \Reliese\Coders\Model\Model $model
+     *
      * @param array $custom
      *
      * @return string
      */
-    protected function modelPath(Model $model, $custom = [])
+    protected function modelPath(Model $model, $custom = [], $preFix = "", $sufFix = "")
     {
         $modelsDirectory = $this->path(array_merge([$this->config($model->getBlueprint(), 'path')], $custom));
 
@@ -482,7 +708,7 @@ class Factory
             $this->files->makeDirectory($modelsDirectory, 0755, true);
         }
 
-        return $this->path([$modelsDirectory, $model->getClassName().'.php']);
+        return $this->path([$modelsDirectory, $preFix.$model->getClassName().$sufFix]);
     }
 
     /**
@@ -507,8 +733,6 @@ class Factory
 
     /**
      * @param \Reliese\Coders\Model\Model $model
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function createUserFile(Model $model)
     {

@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Created by Reliese Model.
+ * Created by BİM Web Birimi.
+ * Date: {{date}}.
  */
 
-namespace {{namespace}};
-
-{{imports}}
+namespace {{namespacemodel}};
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class {{class}}
  * {{properties}}
  *
- * @package {{namespace}}
+ * @package {{namespacemodel}}
  */
-class {{class}} extends {{parent}}
+class {{class}} extends Model
 {
 {{body}}
 }

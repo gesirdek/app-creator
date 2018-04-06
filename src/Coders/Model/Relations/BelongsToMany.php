@@ -202,6 +202,7 @@ class BelongsToMany implements Relation
             $this->otherKey(),
             $this->pivot->getCreatedAtField(),
             $this->pivot->getUpdatedAtField(),
+            $this->pivot->getDeletedAtField(),
         ]);
     }
 

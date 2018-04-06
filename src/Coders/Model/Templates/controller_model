@@ -1,0 +1,66 @@
+<?php
+
+namespace {{namespacecontroller}};
+
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use {{namespacemodel}}\{{class}};
+use {{namespacerequest}}\{{class}}Request;
+
+class {{class}}Controller extends Controller
+{
+    /**
+     * List model
+     * @return array
+     */
+    public function index(){
+        return {{class}}::all();
+    }
+
+    /**
+     * Create model
+     * fields: name,description
+     * @return id
+     */
+    public function store({{class}}Request $request){
+        {{storemodel}}
+    }
+
+    /**
+     * Get model by id
+     * @param id
+     * @return object
+     */
+    public function show($id){
+        if(intval($id) != 0){
+            return {{class}}::find($id);
+        }else{
+            return new {{class}};
+        }
+    }
+
+    /**
+     * Get model by id
+     * @param id
+     * @return object
+     */
+    public function update({{class}}Request $request,$id)
+    {
+        {{updatemodel}}
+    }
+
+    /**
+     * Delete model
+     * @param id
+     * @return boolean
+     */
+    public function destroy($id){
+        if(intval($id) != 0){
+            if({{class}}::find($id)->delete()){
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+}

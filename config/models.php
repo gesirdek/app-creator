@@ -99,15 +99,15 @@ return [
         |
         */
 
-        'timestamps' => true,
+        //'timestamps' => true,
 
-        // 'timestamps' => [
-        //     'enabled' => true,
-        //     'fields' => [
-        //         'CREATED_AT' => 'created_at',
-        //         'UPDATED_AT' => 'updated_at',
-        //     ]
-        // ],
+        'timestamps' => [
+             'enabled' => true,
+             'fields' => [
+                 'CREATED_AT' => 'created_at',
+                 'UPDATED_AT' => 'updated_at',
+             ]
+        ],
 
         /*
         |--------------------------------------------------------------------------
@@ -123,12 +123,12 @@ return [
         |
         */
 
-        'soft_deletes' => true,
+        //'soft_deletes' => true,
 
-        // 'soft_deletes' => [
-        //     'enabled' => true,
-        //     'field' => 'deleted_at',
-        // ],
+        'soft_deletes' => [
+             'enabled' => true,
+             'field' => 'deleted_at',
+         ],
 
         /*
         |--------------------------------------------------------------------------
