@@ -61,7 +61,7 @@ class Schema implements \Gesirdek\Meta\Schema
      */
     protected function load()
     {
-        if($this->schema() == 'bukart'){
+        if($this->schema() == ''){
             $tables = $this->fetchTables('public');
             foreach ($tables as $table) {
                 $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, explode(";",$this->fetchTableComments('public', $table)));
