@@ -41,9 +41,9 @@
         "preferred-install": "dist"
     },
     "extra": {
-        "laravel": {
+        "app-creator": {
             "providers": [
-                "AppCreator\\Coders\\CodersServiceProvider"
+                "Gesirdek\\Coders\\CodersServiceProvider"
             ]
         }
     }
