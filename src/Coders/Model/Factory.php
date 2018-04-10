@@ -263,9 +263,14 @@ class Factory
         $template = str_replace('{{namespacemodel}}', $namespaces[0], $template);
         $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
+        if($model->module=='app'){
+            $template = str_replace('{{vuefilename}}', $model->getClassName(), $template);
+            $template = str_replace('{{vuefilenamelower}}', str_replace('_','', str_singular($model->getTable())), $template);
+        }else{
+            $template = str_replace('{{vuefilename}}', studly_case($model->module).$model->getClassName(), $template);
+            $template = str_replace('{{vuefilenamelower}}', $model->module.str_replace('_','', str_singular($model->getTable())), $template);
+        }
 
-        $template = str_replace('{{vuefilename}}', 'Core'.$model->getClassName(), $template);
-        $template = str_replace('{{vuefilenamelower}}', 'core'.str_replace('_','', str_singular($model->getTable())), $template);
         $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
@@ -297,7 +302,10 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
-                    $body.= '{list:\''.substr($property,0,-2).'list\',source:\'/api/core/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                    if($model->module=='app')
+                        $body.= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                    else
+                        $body.= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$model->module.'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
                 }
             }
         }
@@ -331,7 +339,10 @@ class Factory
      */
     protected function getVueFields(Model $model){
         $body = "\r\n";
-        $vfilename = 'core'.str_replace('_','', str_singular($model->getTable()));
+        if($model->module=='app')
+            $vfilename = str_replace('_','', str_singular($model->getTable()));
+        else
+            $vfilename = $model->module.str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
@@ -423,7 +434,10 @@ class Factory
      */
     protected function getVueModelResourcesTwo(Model $model){
         $body = '';
-        $vfilename = 'core'.str_replace('_','', str_singular($model->getTable()));
+        if($model->module=='app')
+            $vfilename = str_replace('_','', str_singular($model->getTable()));
+        else
+            $vfilename = $model->module.str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 $body .='"'.$vfilename.'.'.$property.'", ';
@@ -518,7 +532,7 @@ class Factory
         $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync([$request->get(\''.$constraint->name().'\')]);'."\n";
             }
         }
         $body .= "\n";
@@ -550,7 +564,7 @@ class Factory
         $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync([$request->get(\''.$constraint->name().'\')]);'."\n";
             }
         }
         $body .= "\n";

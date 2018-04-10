@@ -108,7 +108,7 @@ class Blueprint
      */
     public function getModuleName()
     {
-        if(!file_exists('Modules/'.title_case($this->module))){
+        if(!file_exists('Modules/'.title_case($this->module)) && $this->module!=="app"){
             Artisan::call('module:make', [title_case($this->module)]);
         }
 
