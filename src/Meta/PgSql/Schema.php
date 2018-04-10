@@ -61,14 +61,29 @@ class Schema implements \Gesirdek\Meta\Schema
      */
     protected function load()
     {
-        if($this->schema() == ''){
-            $tables = $this->fetchTables('public');
-            foreach ($tables as $table) {
-                $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, explode(";",$this->fetchTableComments('public', $table)));
-                $this->fillColumns($blueprint);
-                $this->fillConstraints($blueprint);
-                $this->tables[$table] = $blueprint;
+        $tables = $this->fetchTables('public');
+        $extras = [];
+        foreach ($tables as $table) {
+            $extras = explode(";", $this->fetchTableComments('public', $table));
+            $moduleName = "";
+            if (is_array($extras) && !empty($extras)) {
+                $moduleName = $extras[0];
+            } else {
+                $moduleName = $extras;
             }
+
+            if ($moduleName != "" && $moduleName != null && in_array($moduleName, $this->moduleNames) == false) {
+                $this->moduleNames[] = $moduleName;
+            }
+        }
+
+        new RouteCreator($this->moduleNames);
+
+        foreach ($tables as $table) {
+            $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, explode(";", $this->fetchTableComments('public', $table)));
+            $this->fillColumns($blueprint);
+            $this->fillConstraints($blueprint);
+            $this->tables[$table] = $blueprint;
         }
     }
 
