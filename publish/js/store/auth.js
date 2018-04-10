@@ -43,6 +43,9 @@ export const mutations = {
   update_user (state, { user }) {
     state.user = user
   },
+  update_dialog(state,status){
+      state.loginDialog=status;
+  },
   add_to_waiting_requests(state,request){
       state.waiting_requests.push(request);
   },

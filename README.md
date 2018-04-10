@@ -82,6 +82,16 @@ Create necessary js files
 php artisan vendor:publish --tag=gesirdek-vue-scaffolding
 ```
 
+## Admin Panel
+
+Add tih sto your routes.php or web.php
+
+```php
+Route::get('admin/{name?}', function () {
+    return view('admin');
+});
+```
+
 ### Usage
 
 Assuming you have already configured your database, you are now all set to go.

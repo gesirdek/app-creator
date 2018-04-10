@@ -7,7 +7,6 @@
 
 namespace Gesirdek\Meta;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Fluent;
 
 class Blueprint
@@ -108,10 +107,13 @@ class Blueprint
      */
     public function getModuleName()
     {
+<<<<<<< HEAD
         if(!file_exists('Modules/'.title_case($this->module)) && $this->module!=="app"){
             Artisan::call('module:make', [title_case($this->module)]);
         }
 
+=======
+>>>>>>> eac32f857d34bf9b8ca7131536e96e7c93757b22
         return $this->module;
     }
 
