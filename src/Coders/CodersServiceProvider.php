@@ -30,6 +30,9 @@ class CodersServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../publish/js/' => resource_path('assets/js'),
             ], 'gesirdek-vue-base');
+            $this->publishes([
+                __DIR__ . '/../../publish/views/admin.blade.php' => resource_path('views'),
+            ], 'gesirdek-views');
 
             $this->commands([
                 CodeModelsCommand::class,
