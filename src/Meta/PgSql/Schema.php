@@ -2,6 +2,7 @@
 
 namespace Gesirdek\Meta\PgSQL;
 
+use Gesirdek\Coders\Model\RouteCreator;
 use Illuminate\Support\Arr;
 use Gesirdek\Meta\Blueprint;
 use Illuminate\Support\Fluent;
@@ -32,6 +33,11 @@ class Schema implements \Gesirdek\Meta\Schema
      * @var \Gesirdek\Meta\Blueprint[]
      */
     protected $tables = [];
+
+    /**
+     * @var array
+     */
+    protected $moduleNames = [];
 
     /**
      * Mapper constructor.
@@ -87,9 +93,7 @@ class Schema implements \Gesirdek\Meta\Schema
             $this->tables[$table] = $blueprint;
         }
 
-        foreach ($this->moduleNames as $moduleName){
-            RouteCreator::clearExtras($moduleName);
-        }
+        RouteCreator::clearExtras($this->moduleNames);
     }
 
     /**

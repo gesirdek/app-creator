@@ -328,6 +328,7 @@ class Factory
      * @return mixed
      */
     protected function getVueFields(Model $model){
+        //dd($model->getCasts());
         $body = "\r\n";
         $vfilename = kebab_case($model->getBlueprint()->getModuleName()).str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
@@ -339,7 +340,6 @@ class Factory
                     $body .= "\t\t\t\t".'item-value="id"'."\r\n";
                     $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
                     $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
-                    $body .= "\t\t\t\t".':counter="255"'."\r\n";
                     $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$property.'\')"'."\r\n";
                     $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
                     $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
@@ -397,6 +397,21 @@ class Factory
                 }
             }
         }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= "\t\t\t".'<v-select'."\r\n";
+                $body .= "\t\t\t\t".':items="'.$constraint->name().'"'."\r\n";
+                $body .= "\t\t\t\t".'item-text="name"'."\r\n";
+                $body .= "\t\t\t\t".'item-value="id"'."\r\n";
+                $body .= "\t\t\t\t".'v-model="item.'.$constraint->name().'"'."\r\n";
+                $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$constraint->name().'\')"'."\r\n";
+                $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$constraint->name().'\')"'."\r\n";
+                $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
+                $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$constraint->name().'\')"'."\r\n";
+                $body .= "\t\t\t\t".'required'."\r\n";
+                $body .= "\t\t\t".'></v-select>'."\r\n";
+            }
+        }
 
         return $body;
     }
@@ -417,6 +432,16 @@ class Factory
                 }
 
 
+            }
+        }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= "\t\t".'<td><span v-for="r in '.$constraint->name().'" v-if="props.item.'.$constraint->name().'.includes(r.id)">{{ r.name }}</span></td>'."\r\n";
+                /*if(Str::contains($constraint->name(),'_id')){
+                    $body .= "\t\t".'<td>{{ '.substr($constraint->name(),0,-2).'list.filter(function( a ) { return a.id === props.item.'.$constraint->name().'; })[0].name }}</td>'."\r\n";
+                }else{
+                    $body .= "\t\t".'<td>{{ props.item.'.$constraint->name().' }}</td>'."\r\n";
+                }*/
             }
         }
 
@@ -685,6 +710,14 @@ class Factory
         if ($model->hasHints() && $model->usesHints()) {
             $body .= $this->class->field('hints', $model->getHints(), ['before' => "\n"]);
         }
+
+        $withs=[];
+
+        foreach ($model->getRelations() as $constraint) {
+            if(str_plural($constraint->name()) == $constraint->name())
+                $withs[]=$constraint->name();
+        }
+        $body .= $this->class->field('with', $withs, ['before' => "\n"]);
 
         foreach ($model->getMutations() as $mutation) {
             $body .= $this->class->method($mutation->name(), $mutation->body(), ['before' => "\n"]);

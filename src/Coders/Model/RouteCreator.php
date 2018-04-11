@@ -33,20 +33,37 @@ class RouteCreator{
         foreach ($this->moduleNames as $moduleName){
             $this->createFile($moduleName);
         }
+        $this->createMainApiRoutes();
+    }
+
+    protected function createMainApiRoutes(){
+        $file = base_path('routes\\api.php');
+        File::put($file, $this->createContents());
     }
 
     protected function createFile($modulename)
     {
         $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
-        File::put($file, $this->createContents($modulename));
+        File::put($file, $this->createModuleContents($modulename));
     }
 
-    protected function createContents($modulename)
+    protected function createModuleContents($modulename)
     {
         $body = "<?php\n";
         $body .= "Route::group(['middleware' => 'jwt.auth', 'prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
         $body .= "{\n";
         $body .= "{{routebody}}\n";
+        $body .= "});";
+
+        return $body;
+    }
+
+    protected function createContents()
+    {
+        $body = "<?php\n";
+        $body .= "Route::group([/*'middleware' => 'jwt.auth'*/], function()\n";
+        $body .= "{\n";
+        $body .= "/*{{routebody}}*/\n";
         $body .= "});";
 
         return $body;
@@ -59,13 +76,24 @@ class RouteCreator{
             $contents = File::get($file);
             $contents = str_replace('{{routebody}}', "Route::apiResource('".str_replace('_','-',str_singular($table))."', '".studly_case(str_singular($table))."Controller');\n{{routebody}}", $contents);
             File::put($file, $contents);
+        }else{
+            $file = base_path('routes\\api.php');
+            $contents = File::get($file);
+            $contents = str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($table))."', '".studly_case(str_singular($table))."Controller');\n/*{{routebody}}*/", $contents);
+            File::put($file, $contents);
         }
     }
 
-    public static function clearExtras($modulename){
-        $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
+    public static function clearExtras($modulenames){
+        foreach ($modulenames as $modulename){
+            $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
+            $contents = File::get($file);
+            $contents = str_replace('{{routebody}}', '', $contents);
+            File::put($file, $contents);
+        }
+        $file = base_path('routes\\api.php');
         $contents = File::get($file);
-        $contents = str_replace('{{routebody}}', '', $contents);
+        $contents = str_replace('/*{{routebody}}*/', '', $contents);
         File::put($file, $contents);
     }
 

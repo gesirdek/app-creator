@@ -2,6 +2,7 @@
 
 namespace Gesirdek\Meta\MySql;
 
+use Gesirdek\Coders\Model\RouteCreator;
 use Illuminate\Support\Arr;
 use Gesirdek\Meta\Blueprint;
 use Illuminate\Support\Fluent;
@@ -34,6 +35,11 @@ class Schema implements \Gesirdek\Meta\Schema
     protected $tables = [];
 
     /**
+     * @var array
+     */
+    protected $moduleNames = [];
+
+    /**
      * Mapper constructor.
      *
      * @param string $schema
@@ -62,12 +68,32 @@ class Schema implements \Gesirdek\Meta\Schema
     protected function load()
     {
         $tables = $this->fetchTables($this->schema);
+        $extras = [];
         foreach ($tables as $table) {
-            $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table);
+            $extras = explode(";", $this->fetchTableComments($this->schema, $table));
+            $moduleName = "";
+            if (is_array($extras) && !empty($extras)) {
+                $moduleName = $extras[0];
+            } else {
+                $moduleName = $extras;
+            }
+
+            if ($moduleName != "" && $moduleName != null && in_array($moduleName, $this->moduleNames) == false) {
+                $this->moduleNames[] = $moduleName;
+            }
+        }
+
+        new RouteCreator($this->moduleNames);
+
+        foreach ($tables as $table) {
+            $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, explode(";", $this->fetchTableComments('public', $table)));
+            RouteCreator::addContent($blueprint->getModuleName(), $table);
             $this->fillColumns($blueprint);
             $this->fillConstraints($blueprint);
             $this->tables[$table] = $blueprint;
         }
+
+        RouteCreator::clearExtras($this->moduleNames);
     }
 
     /**
@@ -81,6 +107,22 @@ class Schema implements \Gesirdek\Meta\Schema
         $names = array_column($rows, 'Tables_in_'.$schema);
 
         return Arr::flatten($names);
+    }
+
+    /**
+     * @param string $schema
+     *
+     * @return array
+     */
+    protected function fetchTableComments($schema, $table)
+    {
+        $rows = $this->arraify($this->connection
+            ->select('SELECT `TABLE_COMMENT` FROM information_schema.tables  
+            WHERE `tables`.`TABLE_SCHEMA` = \''.$schema.'\'
+            AND `TABLE_NAME` = \''.$table.'\''));
+        if(count($rows))
+            return $rows[0]['TABLE_COMMENT'];
+        return '';
     }
 
     /**
