@@ -144,9 +144,9 @@ class Factory
         if(str_singular($table) == $table){ //pivot table shall not pass
             return;
         }
-
+        
         $model = $this->makeModel($schema, $table);
-        $this->createFiles($model, title_case($moduleName));
+        $this->createFiles($model, $moduleName);
     }
 
     /**
@@ -182,6 +182,7 @@ class Factory
         $template = $this->prepareTemplate($model, 'vue_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleTitle == 'App' ? '' : $moduleTitle),'.vue'), $file);
+
     }
 
     /**
@@ -253,13 +254,13 @@ class Factory
      *
      * @return mixed
      */
-    protected function fillTemplate($template, Model $model, $namespaces)
+    protected function fillTemplate($template, Model $model, $namespaces, $modulename = 'App')
     {
         $template = str_replace('{{date}}', Carbon::now()->toRssString(), $template);
         $template = str_replace('{{namespacemodel}}', $namespaces[0], $template);
         $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
-        
+
         $template = str_replace('{{vuefilename}}', ($modulename == 'app' ? '' : studly_case($modulename)).$model->getClassName(), $template);
         $template = str_replace('{{vuefilenamelower}}', ($modulename == 'app' ? '' : $modulename).str_replace('_','', str_singular($model->getTable())), $template);
         $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
@@ -515,7 +516,7 @@ class Factory
         $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync([$request->get(\''.$constraint->name().'\')]);'."\n";
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
             }
         }
         $body .= "\n";
@@ -547,7 +548,7 @@ class Factory
         $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync([$request->get(\''.$constraint->name().'\')]);'."\n";
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
             }
         }
         $body .= "\n";
