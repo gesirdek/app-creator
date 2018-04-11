@@ -85,6 +85,16 @@ class Model
     /**
      * @var string
      */
+    protected $namespaceController;
+
+    /**
+     * @var string
+     */
+    protected $namespaceRequest;
+
+    /**
+     * @var string
+     */
     protected $parentClass;
 
     /**
@@ -195,6 +205,7 @@ class Model
         $this->withNamespace($namespaces[0]);
         $this->withRequestNamespace($namespaces[1]);
         $this->withControllerNamespace($namespaces[2]);
+
         $this->withParentClass($this->config('parent'));
 
         // Timestamps settings
@@ -459,6 +470,19 @@ class Model
      *
      * @return $this
      */
+    public function withControllerNamespace($namespace)
+    {
+        $this->namespaceController = $namespace;
+
+        return $this;
+    }
+
+
+    /**
+     * @param string $namespace
+     *
+     * @return $this
+     */
     public function withRequestNamespace($namespace)
     {
         $this->namespaceRequest = $namespace;
@@ -472,6 +496,22 @@ class Model
     public function getNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerNamespace()
+    {
+        return $this->namespaceController;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestNamespace()
+    {
+        return $this->namespaceRequest;
     }
 
     /**
@@ -491,7 +531,6 @@ class Model
             ? $this->getNamespace().'\\Base'
             : $this->getNamespace();
     }
-    
 
     /**
      * @param string $parent
