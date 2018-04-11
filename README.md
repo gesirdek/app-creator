@@ -92,16 +92,6 @@ Route::get('admin/{name?}', function () {
 });
 ```
 
-### Usage
-
-Assuming you have already configured your database, you are now all set to go.
-
-- Let's scaffold some of your models from your default connection.
-
-```shell
-php artisan code:models --connection=pgsql --schema=shop
-```
-
 ### Database Creation
 
 Tested only on Postgre.
@@ -111,6 +101,16 @@ To be able to create project from database, consider below for database design.
 - Table names need to be plural form except pivot table names.
 - Pivot table names must include both tables' name as singular form.
 - To implement moduler design, add module name to table comment. If you need to add a comment to any table, add double semicolon (;;) before your comment.
+
+### Usage
+
+Assuming you have already configured your database, you are now all set to go.
+
+- Let's scaffold some of your models from your default connection.
+
+```shell
+php artisan code:models --connection=pgsql --schema=shop
+```
 
 ### Customizing Model Scaffolding
 
