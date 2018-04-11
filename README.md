@@ -14,6 +14,51 @@ composer require gesirdek/app-creator
 
 ### Configuration
 
+Add this to your packages.json and run `npm install`
+
+```json
+{
+  "dependencies": {
+    "axios": "^0.18",
+    "bootstrap": "^4.0.0",
+    "bootstrap-vue": "^2.0.0-rc.6",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
+    "jquery-mask-plugin": "^1.14.15",
+    "js-cookie": "^2.2.0",
+    "material-design-icons": "^3.0.1",
+    "material-icons": "^0.1.0",
+    "npm": "^5.8.0",
+    "popper.js": "^1.12",
+    "sweetalert2": "^7.18.0",
+    "vee-validate": "^2.0.5",
+    "vue": "^2.5.13",
+    "vue-i18n": "^7.5.0",
+    "vue-meta": "^1.4.2",
+    "vue-router": "^3.0.1",
+    "vuetify": "^1.0.5",
+    "vuex": "^3.0.1",
+    "vuex-i18n": "^1.10.5",
+    "vuex-router-sync": "^5.0.0",
+    "waypoints": "^3.1.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "browser-sync": "^2.23.6",
+    "browser-sync-webpack-plugin": "^2.0.1",
+    "cross-env": "^5.1.0",
+    "eslint": "^4.15.0",
+    "eslint-plugin-vue-libs": "^2.1.0",
+    "laravel-mix": "^2.0",
+    "lodash": "^4.17.4",
+    "vue-template-compiler": "^2.5.13",
+    "webpack-bundle-analyzer": "^2.9.2",
+    "popper.js": "^1.12"
+  }
+}
+```  
+
 Add the service provider to your `config/app.php` file within the `providers` key:
 
 ```php
