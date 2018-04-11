@@ -81,9 +81,14 @@ class Schema implements \Gesirdek\Meta\Schema
 
         foreach ($tables as $table) {
             $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, explode(";", $this->fetchTableComments('public', $table)));
+            RouteCreator::addContent($blueprint->getModuleName(), $table);
             $this->fillColumns($blueprint);
             $this->fillConstraints($blueprint);
             $this->tables[$table] = $blueprint;
+        }
+
+        foreach ($this->moduleNames as $moduleName){
+            RouteCreator::clearExtras($moduleName);
         }
     }
 

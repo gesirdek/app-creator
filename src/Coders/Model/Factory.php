@@ -155,10 +155,10 @@ class Factory
      */
     public function createFiles($model, $moduleName)
     {
+        $moduleTitle = title_case($moduleName);
         $namespaces = [];
-        $namespaceMain = ($moduleName == 'App' ? 'App' : 'Modules\\'.$moduleName);
-        $base = ($moduleName == "App" ? "" : 'Modules');
-
+        $namespaceMain = ($moduleTitle == 'App' ? 'App' : 'Modules\\'.$moduleTitle);
+        $base = ($moduleTitle == "App" ? "" : 'Modules');
 
         $namespaces[] = $namespaceMain.'\\Entities'; //Model namespace
         $namespaces[] = $namespaceMain.'\\Http\\Requests'; //Request namespace
@@ -166,22 +166,22 @@ class Factory
 
         $template = $this->prepareTemplate($model, 'model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Entities'],'','.php'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Entities'],'','.php'), $file);
 
         /*REQUEST MODELS*/
         $template = $this->prepareTemplate($model, 'request_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Http','Requests'],'','Request.php'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Requests'],'','Request.php'), $file);
 
         /*CONTROLLERS*/
         $template = $this->prepareTemplate($model, 'controller_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Http','Controllers'],'','Controller.php'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Controllers'],'','Controller.php'), $file);
 
         /*VUE MODELS - FRONT-END*/
         $template = $this->prepareTemplate($model, 'vue_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == 'App' ? '' : $moduleName),($moduleName == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleName == 'App' ? '' : $moduleName),'.vue'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleTitle == 'App' ? '' : $moduleTitle),'.vue'), $file);
     }
 
     /**
@@ -264,8 +264,8 @@ class Factory
         $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
 
-        $template = str_replace('{{vuefilename}}', 'Core'.$model->getClassName(), $template);
-        $template = str_replace('{{vuefilenamelower}}', 'core'.str_replace('_','', str_singular($model->getTable())), $template);
+        $template = str_replace('{{vuefilename}}', ($modulename == 'app' ? '' : title_case($modulename)).$model->getClassName(), $template);
+        $template = str_replace('{{vuefilenamelower}}', ($modulename == 'app' ? '' : $modulename).str_replace('_','', str_singular($model->getTable())), $template);
         $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);

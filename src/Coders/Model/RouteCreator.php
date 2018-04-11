@@ -9,7 +9,10 @@
 namespace Gesirdek\Coders\Model;
 
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+
+
 
 class RouteCreator{
     protected $moduleNames;
@@ -28,19 +31,19 @@ class RouteCreator{
         }
 
         foreach ($this->moduleNames as $moduleName){
-            $this->createFile(title_case($moduleName));
+            $this->createFile($moduleName);
         }
     }
 
     protected function createFile($modulename)
     {
-        $file = base_path('Modules\\'.$modulename.'\\Http\\routes.php');
-        Storage::put($file, $this->createContents($modulename));
+        $file = base_path('Modules\\'.title_case($modulename).'\\Http\\routes.php');
+        File::put($file, $this->createContents($modulename));
     }
 
     protected function createContents($modulename)
     {
-        $body = "";
+        $body = "<?php\n";
         $body .= "Route::group(['middleware' => 'jwt.auth', 'prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".title_case($modulename)."\Http\Controllers'], function()\n";
         $body .= "{\n";
         $body .= "{{routebody}}\n";
@@ -48,4 +51,23 @@ class RouteCreator{
 
         return $body;
     }
+
+
+    public static function addContent($modulename, $table){
+        if($modulename != "app"){
+            $file = base_path('Modules\\'.$modulename.'\\Http\\routes.php');
+            $contents = File::get($file);
+            $contents = str_replace('{{routebody}}', "Route::apiResource('".str_singular($table)."', '".studly_case(str_singular($table))."Controller');\n{{routebody}}", $contents);
+            File::put($file, $contents);
+        }
+    }
+
+    public static function clearExtras($modulename){
+        $file = base_path('Modules\\'.$modulename.'\\Http\\routes.php');
+        $contents = File::get($file);
+        $contents = str_replace('{{routebody}}', '', $contents);
+        File::put($file, $contents);
+    }
+
+
 }
