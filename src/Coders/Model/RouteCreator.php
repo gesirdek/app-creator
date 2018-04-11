@@ -57,7 +57,7 @@ class RouteCreator{
         if($modulename != "app"){
             $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
             $contents = File::get($file);
-            $contents = str_replace('{{routebody}}', "Route::apiResource('".str_singular($table)."', '".studly_case(str_singular($table))."Controller');\n{{routebody}}", $contents);
+            $contents = str_replace('{{routebody}}', "Route::apiResource('".kebab_case(str_singular($table))."', '".studly_case(str_singular($table))."Controller');\n{{routebody}}", $contents);
             File::put($file, $contents);
         }
     }
