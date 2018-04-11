@@ -23,7 +23,7 @@ Add the service provider to your `config/app.php` file within the `providers` ke
      * Package Service Providers...
      */
 
-    AppCreator\Coders\CodersServiceProvider::class,
+    Gesirdek\Coders\CodersServiceProvider::class,
 ],
 // ...
 ```
@@ -61,7 +61,7 @@ Then you'll need to register the provider in `app/Providers/AppServiceProvider.p
 public function register()
 {
     if ($this->app->environment() == 'local') {
-        $this->app->register(AppCreator\Coders\CodersServiceProvider::class);
+        $this->app->register(Gesirdek\Coders\CodersServiceProvider::class);
     }
 }
 ```
@@ -79,7 +79,7 @@ php artisan config:clear
 
 Create necessary js files
 ```shell
-php artisan vendor:publish --tag=gesirdek-vue-scaffolding
+php artisan vendor:publish --tag=gesirdek-vue-base
 ```
 
 ## Admin Panel
