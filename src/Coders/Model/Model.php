@@ -455,6 +455,18 @@ class Model
     }
 
     /**
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    public function withRequestNamespace($namespace)
+    {
+        $this->namespaceRequest = $namespace;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getNamespace()
@@ -479,6 +491,7 @@ class Model
             ? $this->getNamespace().'\\Base'
             : $this->getNamespace();
     }
+    
 
     /**
      * @param string $parent
