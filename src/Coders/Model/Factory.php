@@ -375,7 +375,7 @@ class Factory
                     $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
                     $body .= "\t\t\t\t".'required'."\r\n";
                     $body .= "\t\t\t".'></v-text-field>'."\r\n";
-                else if($dataType == 'bigstring') {
+                }else if($dataType == 'bigstring') {
                         $body .= "\t\t\t".'<v-text-field'."\r\n";
                         $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
                         $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
