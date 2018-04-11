@@ -29,8 +29,8 @@ class Column implements \Gesirdek\Meta\Column
      * @var array
      */
     public static $mappings = [
-        'string' => ['varchar', 'string', 'char', 'enum', 'tinytext', 'mediumtext', 'longtext', 'character'],
-        'bigstring' => ['text'],
+        'string' => ['varchar', 'string', 'char', 'enum', 'tinytext', 'mediumtext', 'character'],
+        'bigstring' => ['longtext', 'text'],
         'date' => ['datetime', 'year', 'date', 'time', 'timestamp'],
         'integer' => ['bigint', 'int', 'integer', 'tinyint', 'smallint', 'mediumint'],
         'float' => ['float', 'decimal', 'numeric', 'dec', 'fixed', 'double', 'real', 'double precision'],

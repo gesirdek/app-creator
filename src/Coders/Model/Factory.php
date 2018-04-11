@@ -525,7 +525,7 @@ class Factory
         $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync($request->get(\''.$constraint->name().'\'));'."\n";
             }
         }
         $body .= "\n";
@@ -557,7 +557,7 @@ class Factory
         $body .= "\t\t\t".'/*Add your syncs here*/'."\n";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync[$request->get(\''.$constraint->name().'\')];'."\n";
+                $body .= "\t\t\t".'$model->'.$constraint->name().'()->sync($request->get(\''.$constraint->name().'\'));'."\n";
             }
         }
         $body .= "\n";
