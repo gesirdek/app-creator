@@ -113,7 +113,7 @@ class Blueprint
     /**
      * @return string
      */
-    public function getModuleStudylCase()
+    public function getModuleStudlyCase()
     {
         return studly_case($this->module);
     }
