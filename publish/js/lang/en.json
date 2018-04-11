@@ -1,0 +1,8 @@
+{
+  "table_actions":"Actions",
+  "welcome":"Welcome",
+  "token_expired_alert_title":"Your Session Expired",
+  "token_expired_alert_text":"You need to login",
+  "ok":"OK",
+  "cancel":"Cancel"
+}

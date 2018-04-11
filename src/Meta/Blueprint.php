@@ -113,6 +113,14 @@ class Blueprint
     /**
      * @return string
      */
+    public function getModuleStudylCase()
+    {
+        return studly_case($this->module);
+    }
+
+    /**
+     * @return string
+     */
     public function qualifiedTable()
     {
         return $this->schema().'.'.$this->table();

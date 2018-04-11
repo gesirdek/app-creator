@@ -27,12 +27,32 @@ Add the service provider to your `config/app.php` file within the `providers` ke
 ],
 // ...
 ```
+
+Add this to your webpack.mix file
+
+```js
+mix.webpackConfig({
+    resolve: {
+        extensions: ['.js', '.json', '.vue'],
+        alias: {
+            '~': path.join(__dirname, './resources/assets/js')
+        }
+    },
+    output: {
+        chunkFilename: 'js/[name].[chunkhash].js',
+        publicPath: mix.config.hmr ? '//localhost:8080' : '/'
+    }
+}).options({
+    extractVueStyles: true
+});
+```
+ 
 ### Configuration for local environment only
 
 If you wish to enable generators only for your local environment, you should install it via composer using the --dev option like this:
 
 ```shell
-composer require app-creator --dev
+composer require gesirdek/app-creator --dev
 ```
 
 Then you'll need to register the provider in `app/Providers/AppServiceProvider.php` file.
@@ -49,6 +69,28 @@ public function register()
 ## Models
 
 Add the `models.php` configuration file to your `config` directory.
+
+```shell
+php artisan vendor:publish --tag=gesirdek-models
+php artisan config:clear
+```
+
+## Vue Scaffolding
+
+Create necessary js files
+```shell
+php artisan vendor:publish --tag=gesirdek-vue-scaffolding
+```
+
+## Admin Panel
+
+Add tih sto your routes.php or web.php
+
+```php
+Route::get('admin/{name?}', function () {
+    return view('admin');
+});
+```
 
 ### Usage
 

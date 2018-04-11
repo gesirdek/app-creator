@@ -27,7 +27,7 @@ class RouteCreator{
     protected function createRoutes()
     {
         foreach ($this->moduleNames as $moduleName){
-            Artisan::call('module:make', [title_case($moduleName)]);
+            Artisan::call('module:make', [studly_case($moduleName)]);
         }
 
         foreach ($this->moduleNames as $moduleName){
@@ -37,14 +37,14 @@ class RouteCreator{
 
     protected function createFile($modulename)
     {
-        $file = base_path('Modules\\'.title_case($modulename).'\\Http\\routes.php');
+        $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
         File::put($file, $this->createContents($modulename));
     }
 
     protected function createContents($modulename)
     {
         $body = "<?php\n";
-        $body .= "Route::group(['middleware' => 'jwt.auth', 'prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".title_case($modulename)."\Http\Controllers'], function()\n";
+        $body .= "Route::group(['middleware' => 'jwt.auth', 'prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
         $body .= "{\n";
         $body .= "{{routebody}}\n";
         $body .= "});";
@@ -55,7 +55,7 @@ class RouteCreator{
 
     public static function addContent($modulename, $table){
         if($modulename != "app"){
-            $file = base_path('Modules\\'.$modulename.'\\Http\\routes.php');
+            $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
             $contents = File::get($file);
             $contents = str_replace('{{routebody}}', "Route::apiResource('".str_singular($table)."', '".studly_case(str_singular($table))."Controller');\n{{routebody}}", $contents);
             File::put($file, $contents);
@@ -63,7 +63,7 @@ class RouteCreator{
     }
 
     public static function clearExtras($modulename){
-        $file = base_path('Modules\\'.$modulename.'\\Http\\routes.php');
+        $file = base_path('Modules\\'.studly_case($modulename).'\\Http\\routes.php');
         $contents = File::get($file);
         $contents = str_replace('{{routebody}}', '', $contents);
         File::put($file, $contents);
