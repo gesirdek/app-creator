@@ -173,8 +173,8 @@ class Model
     public function __construct(Blueprint $blueprint, Factory $factory, $mutators = [], $loadRelations = true)
     {
         $namespaces = [];
-        $namespaceMain = ($blueprint->getModuleName() == 'App' ? 'App' : 'Modules\\'.title_case($blueprint->getModuleName()));
-        $base = (title_case($blueprint->getModuleName()) == "App" ? "" : 'Modules');
+        $namespaceMain = ($blueprint->getModuleName() == 'App' ? 'App' : 'Modules\\'.$blueprint->getModuleStudlyCase());
+        $base = ($blueprint->getModuleStudlyCase() == "App" ? "" : 'Modules');
 
 
         $namespaces[] = $namespaceMain.'\\Entities'; //Model namespace
@@ -455,6 +455,18 @@ class Model
     }
 
     /**
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    public function withRequestNamespace($namespace)
+    {
+        $this->namespaceRequest = $namespace;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getNamespace()
@@ -479,6 +491,7 @@ class Model
             ? $this->getNamespace().'\\Base'
             : $this->getNamespace();
     }
+    
 
     /**
      * @param string $parent

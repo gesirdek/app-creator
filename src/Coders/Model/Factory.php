@@ -155,10 +155,10 @@ class Factory
      */
     public function createFiles($model, $moduleName)
     {
+        $moduleTitle = studly_case($moduleName);
         $namespaces = [];
-        $namespaceMain = ($moduleName == 'App' ? 'App' : 'Modules\\'.$moduleName);
-        $base = ($moduleName == "App" ? "" : 'Modules');
-
+        $namespaceMain = ($moduleTitle == 'App' ? 'App' : 'Modules\\'.$moduleTitle);
+        $base = ($moduleTitle == "App" ? "" : 'Modules');
 
         $namespaces[] = $namespaceMain.'\\Entities'; //Model namespace
         $namespaces[] = $namespaceMain.'\\Http\\Requests'; //Request namespace
@@ -166,22 +166,22 @@ class Factory
 
         $template = $this->prepareTemplate($model, 'model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Entities'],'','.php'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Entities'],'','.php'), $file);
 
         /*REQUEST MODELS*/
         $template = $this->prepareTemplate($model, 'request_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Http','Requests'],'','Request.php'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Requests'],'','Request.php'), $file);
 
         /*CONTROLLERS*/
         $template = $this->prepareTemplate($model, 'controller_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == "App" ? "app" : $moduleName),'Http','Controllers'],'','Controller.php'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Controllers'],'','Controller.php'), $file);
 
         /*VUE MODELS - FRONT-END*/
         $template = $this->prepareTemplate($model, 'vue_model');
         $file = $this->fillTemplate($template, $model, $namespaces);
-        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleName == 'App' ? '' : $moduleName),($moduleName == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleName == 'App' ? '' : $moduleName),'.vue'), $file);
+        $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleTitle == 'App' ? '' : $moduleTitle),'.vue'), $file);
     }
 
     /**
@@ -256,21 +256,12 @@ class Factory
     protected function fillTemplate($template, Model $model, $namespaces)
     {
         $template = str_replace('{{date}}', Carbon::now()->toRssString(), $template);
-
-        /*if($model->getTable() == "balance_types"){
-            dd($namespaces);
-        }*/
         $template = str_replace('{{namespacemodel}}', $namespaces[0], $template);
         $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
-        if($model->module=='app'){
-            $template = str_replace('{{vuefilename}}', $model->getClassName(), $template);
-            $template = str_replace('{{vuefilenamelower}}', str_replace('_','', str_singular($model->getTable())), $template);
-        }else{
-            $template = str_replace('{{vuefilename}}', studly_case($model->module).$model->getClassName(), $template);
-            $template = str_replace('{{vuefilenamelower}}', $model->module.str_replace('_','', str_singular($model->getTable())), $template);
-        }
-
+        
+        $template = str_replace('{{vuefilename}}', ($modulename == 'app' ? '' : studly_case($modulename)).$model->getClassName(), $template);
+        $template = str_replace('{{vuefilenamelower}}', ($modulename == 'app' ? '' : $modulename).str_replace('_','', str_singular($model->getTable())), $template);
         $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
@@ -279,6 +270,7 @@ class Factory
         $template = str_replace('{{lists}}', $this->getVueLists($model), $template);
         $template = str_replace('{{listdata}}', $this->getVueListData($model), $template);
         $template = str_replace('{{lowerclass}}', str_replace('_','-', str_singular($model->getTable())), $template);
+        $template = str_replace('{{modulename}}', kebab_case($modulename), $template);
 
         $template = str_replace('{{parent}}', $model->getParentClass(), $template);
         $template = str_replace('{{rules}}', $this->getRules($model), $template);
@@ -302,10 +294,7 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
-                    if($model->module=='app')
-                        $body.= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
-                    else
-                        $body.= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$model->module.'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                    $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.kebab_case($model->getBlueprint()->getModuleName()).'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
                 }
             }
         }
@@ -339,10 +328,7 @@ class Factory
      */
     protected function getVueFields(Model $model){
         $body = "\r\n";
-        if($model->module=='app')
-            $vfilename = str_replace('_','', str_singular($model->getTable()));
-        else
-            $vfilename = $model->module.str_replace('_','', str_singular($model->getTable()));
+        $vfilename = kebab_case($model->getBlueprint()->getModuleName()).str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
@@ -434,10 +420,7 @@ class Factory
      */
     protected function getVueModelResourcesTwo(Model $model){
         $body = '';
-        if($model->module=='app')
-            $vfilename = str_replace('_','', str_singular($model->getTable()));
-        else
-            $vfilename = $model->module.str_replace('_','', str_singular($model->getTable()));
+        $vfilename = kebab_case($model->getBlueprint()->getModuleName()).str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 $body .='"'.$vfilename.'.'.$property.'", ';
