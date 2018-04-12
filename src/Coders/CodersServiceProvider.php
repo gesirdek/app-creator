@@ -26,14 +26,10 @@ class CodersServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../../publish/config/models.php' => config_path('models.php'),
-            ], 'gesirdek-models');
-            $this->publishes([
                 __DIR__ . '/../../publish/js/' => resource_path('assets/js'),
                 __DIR__ . '/../../publish/base/.babelrc' => base_path('.babelrc'),
-            ], 'gesirdek-vue-base');
-            $this->publishes([
                 __DIR__ . '/../../publish/views/admin.blade.php' => resource_path('views'),
-            ], 'gesirdek-views');
+            ], 'gesirdek-models');
 
             $this->commands([
                 CodeModelsCommand::class,
