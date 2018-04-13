@@ -88,7 +88,9 @@ class RouteCreator{
 
     protected function createJsContents()
     {
-        $body = "/*{{imports}}*/\n\n";
+        $body = "import Home from '../components/Home'\n";
+        $body .= "import PageNotFound from '../components/PageNotFound'\n";
+        $body .= "/*{{imports}}*/\n\n";
         $body .= "export default \n";
         $body .= "[\n";
         $body .= "\t{ path: '/', name: 'Home', component: Home },\n";
