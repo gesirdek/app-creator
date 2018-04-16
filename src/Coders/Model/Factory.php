@@ -170,7 +170,7 @@ class Factory
 
         /*REQUEST MODELS*/
         $template = $this->prepareTemplate($model, 'request_model');
-        $file = $this->fillTemplate($template, $model, $namespaces,$moduleTitle);
+        $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Requests'],'','Request.php'), $file);
 
         /*CONTROLLERS*/
@@ -271,7 +271,6 @@ class Factory
         $template = str_replace('{{lists}}', $this->getVueLists($model), $template);
         $template = str_replace('{{listdata}}', $this->getVueListData($model), $template);
         $template = str_replace('{{lowerclass}}', str_replace('_','-', str_singular($model->getTable())), $template);
-
         $template = str_replace('{{modulename}}', ($modulename == 'App' ? 'api' : 'api/'.kebab_case($modulename)), $template);
 
         $template = str_replace('{{parent}}', $model->getParentClass(), $template);
@@ -296,7 +295,7 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
-                    $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.kebab_case($model->getBlueprint()->getModuleName()).'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                    $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
                 }
             }
         }
@@ -456,7 +455,7 @@ class Factory
      */
     protected function getVueModelResourcesTwo(Model $model){
         $body = '';
-        $vfilename = kebab_case($model->getBlueprint()->getModuleName()).str_replace('_','', str_singular($model->getTable()));
+        $vfilename = ($model->getBlueprint()->getModuleName() == 'app' ? '' : kebab_case($model->getBlueprint()->getModuleName())).str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 $body .='"'.$vfilename.'.'.$property.'", ';
