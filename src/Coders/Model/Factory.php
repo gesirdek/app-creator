@@ -165,22 +165,22 @@ class Factory
         $namespaces[] = $namespaceMain.'\\Http\\Controllers'; //Controller namespace
 
         $template = $this->prepareTemplate($model, 'model');
-        $file = $this->fillTemplate($template, $model, $namespaces);
+        $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Entities'],'','.php'), $file);
 
         /*REQUEST MODELS*/
         $template = $this->prepareTemplate($model, 'request_model');
-        $file = $this->fillTemplate($template, $model, $namespaces);
+        $file = $this->fillTemplate($template, $model, $namespaces,$moduleTitle);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Requests'],'','Request.php'), $file);
 
         /*CONTROLLERS*/
         $template = $this->prepareTemplate($model, 'controller_model');
-        $file = $this->fillTemplate($template, $model, $namespaces);
+        $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == "App" ? "app" : $moduleTitle),'Http','Controllers'],'','Controller.php'), $file);
 
         /*VUE MODELS - FRONT-END*/
         $template = $this->prepareTemplate($model, 'vue_model');
-        $file = $this->fillTemplate($template, $model, $namespaces);
+        $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleTitle == 'App' ? '' : $moduleTitle),'.vue'), $file);
 
     }
@@ -261,8 +261,8 @@ class Factory
         $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
 
-        $template = str_replace('{{vuefilename}}', ($modulename == 'app' ? '' : studly_case($modulename)).$model->getClassName(), $template);
-        $template = str_replace('{{vuefilenamelower}}', ($modulename == 'app' ? '' : $modulename).str_replace('_','', str_singular($model->getTable())), $template);
+        $template = str_replace('{{vuefilename}}', ($modulename == 'App' ? '' : studly_case($modulename)).$model->getClassName(), $template);
+        $template = str_replace('{{vuefilenamelower}}', ($modulename == 'App' ? '' : $modulename).str_replace('_','', str_singular($model->getTable())), $template);
         $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
@@ -271,7 +271,8 @@ class Factory
         $template = str_replace('{{lists}}', $this->getVueLists($model), $template);
         $template = str_replace('{{listdata}}', $this->getVueListData($model), $template);
         $template = str_replace('{{lowerclass}}', str_replace('_','-', str_singular($model->getTable())), $template);
-        $template = str_replace('{{modulename}}', kebab_case($modulename), $template);
+
+        $template = str_replace('{{modulename}}', ($modulename == 'App' ? 'api' : 'api/'.kebab_case($modulename)), $template);
 
         $template = str_replace('{{parent}}', $model->getParentClass(), $template);
         $template = str_replace('{{rules}}', $this->getRules($model), $template);

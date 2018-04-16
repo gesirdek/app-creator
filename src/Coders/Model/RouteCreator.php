@@ -28,9 +28,9 @@ class RouteCreator{
     protected function createRoutes()
     {
         foreach ($this->moduleNames as $moduleName){
-            Artisan::call('module:make', [studly_case($moduleName)]);
+            Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
         }
-
+        
         $this->createMainApiRoutes();
         $this->createRoutesJs();
 
