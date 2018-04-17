@@ -135,7 +135,7 @@ class RouteCreator{
 
                 $file = base_path('resources\\assets\\js\\router\\routes.js');
                 $contents = File::get($file);
-                $contents = str_replace('/*{{modulus}}*/',"\t".'{ path: \''.studly_case(str_singular($blueprint->table())).'\', name: \''.studly_case(str_singular($blueprint->table())).'\', component: '.studly_case(str_singular($blueprint->table())).' },'."\n/*{{modulus}}*/", $contents);
+                $contents = str_replace('/*{{modulus}}*/',"\t".'{ path: \'/'.studly_case(str_singular($blueprint->table())).'\', name: \''.studly_case(str_singular($blueprint->table())).'\', component: '.studly_case(str_singular($blueprint->table())).' },'."\n/*{{modulus}}*/", $contents);
                 File::put($file, $contents);
             }
         }
