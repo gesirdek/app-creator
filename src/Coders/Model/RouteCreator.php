@@ -30,7 +30,7 @@ class RouteCreator{
         foreach ($this->moduleNames as $moduleName){
             Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
         }
-        
+
         $this->createMainApiRoutes();
         $this->createRoutesJs();
 
@@ -94,7 +94,6 @@ class RouteCreator{
         $body .= "export default \n";
         $body .= "[\n";
         $body .= "\t{ path: '/', name: 'Home', component: Home },\n";
-        $body .= "\t{ path: \"*\",name:'404' , component: PageNotFound },\n";
         $body .= "/*{{modulus}}*/\n";
         $body .= "]";
 
@@ -163,7 +162,7 @@ class RouteCreator{
 
         $file = base_path('resources\\assets\\js\\router\\routes.js');
         $contents = File::get($file);
-        $contents = str_replace('/*{{modulus}}*/', '', $contents);
+        $contents = str_replace('/*{{modulus}}*/', "\t{ path: \"*\", name: '404' , component: PageNotFound }\n", $contents);
         $contents = str_replace('/*{{imports}}*/', '', $contents);
         File::put($file, $contents);
     }
