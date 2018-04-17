@@ -22,7 +22,8 @@ function createRouter () {
     const router = new Router({
         scrollBehavior,
         mode: 'history',
-        routes
+        routes,
+        base:'/admin'
     })
 
     router.beforeEach(check_auth)

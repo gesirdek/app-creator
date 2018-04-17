@@ -281,6 +281,7 @@ return [
 
         'except' => [
             'migrations',
+            'password_resets'
         ],
 
         /*

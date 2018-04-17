@@ -72,25 +72,6 @@ Add the service provider to your `config/app.php` file within the `providers` ke
 ],
 // ...
 ```
-
-Add this to your webpack.mix file
-
-```js
-mix.webpackConfig({
-    resolve: {
-        extensions: ['.js', '.json', '.vue'],
-        alias: {
-            '~': path.join(__dirname, './resources/assets/js')
-        }
-    },
-    output: {
-        chunkFilename: 'js/[name].[chunkhash].js',
-        publicPath: mix.config.hmr ? '//localhost:8080' : '/'
-    }
-}).options({
-    extractVueStyles: true
-});
-```
  
 ### Configuration for local environment only
 
@@ -116,20 +97,13 @@ public function register()
 Add the `models.php` configuration file to your `config` directory.
 
 ```shell
-php artisan vendor:publish --tag=gesirdek-models
+php artisan vendor:publish --tag=gesirdek-models --force
 php artisan config:clear
-```
-
-## Vue Scaffolding
-
-Create necessary js files
-```shell
-php artisan vendor:publish --tag=gesirdek-vue-base
 ```
 
 ## Admin Panel
 
-Add tih sto your routes.php or web.php
+Add this to your routes.php or web.php depending on your laravel verison.
 
 ```php
 Route::get('admin/{name?}', function () {
@@ -156,6 +130,18 @@ Assuming you have already configured your database, you are now all set to go.
 ```shell
 php artisan code:models --connection=pgsql --schema=shop
 ```
+
+If you are using mysql
+```shell
+php artisan code:models
+```
+
+Then run
+```shell
+npm run production
+```
+
+Thats it! Your admin panel with DB CURD's is ready under /admin !
 
 ### Customizing Model Scaffolding
 
