@@ -128,12 +128,12 @@ Assuming you have already configured your database, you are now all set to go.
 - Let's scaffold some of your models from your default connection.
 
 ```shell
-php artisan code:models --connection=pgsql --schema=shop
+php artisan code:models
 ```
 
-If you are using mysql
+If you are using POSTGRESQL
 ```shell
-php artisan code:models
+php artisan code:models --connection=pgsql
 ```
 
 Then run
