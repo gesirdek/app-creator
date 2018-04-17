@@ -330,7 +330,7 @@ class Factory
     protected function getVueFields(Model $model){
         //dd($model->getCasts());
         $body = "\r\n";
-        $vfilename = kebab_case($model->getBlueprint()->getModuleName()).str_replace('_','', str_singular($model->getTable()));
+        $vfilename = ($model->getBlueprint()->getModuleName() == 'app' ? '' : kebab_case($model->getBlueprint()->getModuleName())).str_replace('_','', str_singular($model->getTable()));
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
