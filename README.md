@@ -14,7 +14,7 @@ composer require gesirdek/app-creator
 
 ### Configuration
 
-Add this to your packages.json and run `npm install`
+Add this to your package.json and run `npm install`
 
 ```json
 {
@@ -113,8 +113,6 @@ Route::get('admin/{name?}', function () {
 
 ### Database Creation
 
-Tested only on Postgre.
-
 To be able to create project from database, consider below for database design.
 
 - Table names need to be plural form except pivot table names.
@@ -125,7 +123,7 @@ To be able to create project from database, consider below for database design.
 
 Assuming you have already configured your database, you are now all set to go.
 
-- Let's scaffold some of your models from your default connection.
+- Let's scaffold some of your models from your default (mysql) connection.
 
 ```shell
 php artisan code:models
