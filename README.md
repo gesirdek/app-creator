@@ -127,7 +127,7 @@ composer require nwidart/laravel-modules
 
 After that change add red composer
 
-```json
+```diff
 "autoload": {
         "classmap": [
             "database/seeds",
@@ -135,7 +135,7 @@ After that change add red composer
         ],
         "psr-4": {
             "App\\": "app/",
-            !"Modules\\": "Modules/"
+            -"Modules\\": "Modules/"
         }
     },
 ```
