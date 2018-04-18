@@ -36,6 +36,7 @@ class RouteCreator{
 
         foreach ($this->moduleNames as $moduleName){
             $this->createFile($moduleName);
+            $this->createModuleVue($moduleName);
         }
 
 
@@ -60,8 +61,28 @@ class RouteCreator{
         $contents = File::get($file);
         $contents = str_replace('/*{{modulus}}*/', "\t{ path: '/".studly_case($modulename)."', name: '".studly_case($modulename)."', component: ".studly_case($modulename).",
         children: [\n/*{{module_content_".$modulename."}}*/\n\t\t]},\n/*{{modulus}}*/", $contents);
+        $contents = str_replace('/*{{imports}}*/', "import ".studly_case($modulename)." from '../../../../Modules/".studly_case($modulename)."/Resources/assets/js/components/".studly_case($modulename).".vue'\n/*{{imports}}*/", $contents);
         File::put($file, $contents);
+    }
 
+    protected function createModuleVue($modulename){
+        $contents = "<template>\n";
+        $contents .="\t<div>\n";
+        $contents .="\t\t<h1>".title_case($modulename)."</h1>\n";
+        $contents .="\t\t<router-view></router-view>\n";
+        $contents .="\t</div>\n";
+        $contents .="</template>\n";
+        $contents .="<script>\n";
+        $contents .="\t\texport default {\n";
+        $contents .="\t\t\tname: '".studly_case($modulename)."',\n";
+        $contents .="\t\t\tdata () {\n";
+        $contents .="\t\t\t\treturn {}\n";
+        $contents .="\t\t\t}\n";
+        $contents .="\t\t}\n";
+        $contents .="</script>";
+
+        $file = base_path('Modules\\'.studly_case($modulename).'\\Resources\\assets\\js\\components\\'.studly_case($modulename));
+        File::put($file, $contents);
     }
 
     protected function createModuleContents($modulename)
