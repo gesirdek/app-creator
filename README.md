@@ -125,7 +125,7 @@ To be able to use modular design, add nWidart package
 composer require nwidart/laravel-modules
 ```
 
-After that add modules directory to composer.json
+After that add modules directory (**_"Modules\\": "Modules/"_**) to composer.json
 
 ```json
 {
@@ -136,7 +136,7 @@ After that add modules directory to composer.json
         ],
         "psr-4": {
             "App\\": "app/",
-            **_"Modules\\": "Modules/"_**
+            "Modules\\": "Modules/"
         }
     },
 }
