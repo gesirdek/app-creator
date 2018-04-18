@@ -99,7 +99,7 @@ class RouteCreator{
     protected function createModuleContents($modulename)
     {
         $body = "<?php\n";
-        $body .= "Route::group(['middleware' => 'jwt.auth', 'prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
+        $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
         $body .= "{\n";
         $body .= "{{routebody}}\n";
         $body .= "});";
@@ -109,7 +109,7 @@ class RouteCreator{
     protected function createContents()
     {
         $body = "<?php\n";
-        $body .= "Route::group([/*'middleware' => 'jwt.auth'*/], function()\n";
+        $body .= "Route::group([], function()\n";
         $body .= "{\n";
         $body .= "/*{{routebody}}*/\n";
         $body .= "});";
