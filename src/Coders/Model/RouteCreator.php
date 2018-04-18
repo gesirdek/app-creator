@@ -81,7 +81,7 @@ class RouteCreator{
         $contents .="\t\t}\n";
         $contents .="</script>";
 
-        $file = base_path('Modules\\'.studly_case($modulename).'\\Resources\\assets\\js\\components\\'.studly_case($modulename));
+        $file = base_path('Modules\\'.studly_case($modulename).'\\Resources\\assets\\js\\components\\'.studly_case($modulename).'.vue');
         File::put($file, $contents);
     }
 
