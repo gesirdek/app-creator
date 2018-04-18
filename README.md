@@ -1,8 +1,8 @@
 # App-Creator
 
-- ![#f03c15] rest `#f03c15`
-- ![#c5f015] `#c5f015`
-- ![#1589F0] `#1589F0`
+- ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`
+- ![#c5f015](https://placehold.it/15/c5f015/000000?text=+) `#c5f015`
+- ![#1589F0](https://placehold.it/15/1589F0/000000?text=+) `#1589F0`
 
 App-Creator is a collection of Laravel Components which aim is 
 to create Laravel 5.6 and Vue2 application from database.
@@ -129,9 +129,10 @@ To be able to use modular design, add nWidart package
 composer require nwidart/laravel-modules
 ```
 
-After that change add red composer
+After that add modules directory to composer.json
 
-```diff
+```json
+{
 "autoload": {
         "classmap": [
             "database/seeds",
@@ -142,6 +143,7 @@ After that change add red composer
           - "Modules\\": "Modules/"
         }
     },
+}
 ```
 
 ### Usage
