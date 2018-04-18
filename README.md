@@ -145,7 +145,7 @@ Then run
 npm run production
 ```
 
-Thats it! Your admin panel with DB CURD's is ready under /admin !
+Thats it! Your admin panel with DB CRUD's is ready under /admin !
 
 ### Customizing Model Scaffolding
 
