@@ -125,6 +125,21 @@ To be able to use modular design, add nWidart package
 composer require nwidart/laravel-modules
 ```
 
+After that change add red composer
+
+```json
+"autoload": {
+        "classmap": [
+            "database/seeds",
+            "database/factories"
+        ],
+        "psr-4": {
+            "App\\": "app/",
+            ![#f03c15]"Modules\\": "Modules/"`#f03c15`
+        }
+    },
+```
+
 ### Usage
 
 Assuming you have already configured your database, you are now all set to go.
