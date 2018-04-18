@@ -117,7 +117,13 @@ To be able to create project from database, consider below for database design.
 
 - Table names need to be plural form except pivot table names.
 - Pivot table names must include both tables' name as singular form.
-- To implement moduler design, add module name to table comment. If you need to add a comment to any table, add double semicolon (;;) before your comment.
+- To implement modular design, add module name to table comment. If you need to add a comment to any table, add double semicolon (;;) before your comment.
+
+To be able to use modular design, add nWidart package
+
+```shell
+composer require nwidart/laravel-modules
+```
 
 ### Usage
 
