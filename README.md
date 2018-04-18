@@ -142,6 +142,11 @@ After that add modules directory (`"Modules\\": "Modules/"`) to composer.json
 }
 ```
 
+After that run composer dumpautoload
+```shell
+composer dumpautoload
+```
+
 ### Usage
 
 Assuming you have already configured your database, you are now all set to go.
