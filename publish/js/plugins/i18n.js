@@ -14,7 +14,7 @@ const components_messages = [];
  * @param {String} locale
  */
 export async function loadMessages (locale) {
-    const messages = await import(/* webpackChunkName: "lang-[request]" */ `~/lang/${locale}`);
+    const messages = await import(`~/lang/${locale}`);
     i18n.setLocaleMessage(locale, messages);
     if(components_messages.length > 0){
         let a = 0;
@@ -39,23 +39,11 @@ export function loadComponentMessages (messages) {
     let component_name = Object.keys(messages)[0];
     components_messages.push(messages);
     i18n.mergeLocaleMessage(i18n.locale, {[component_name]:messages[component_name][i18n.locale]});
-    console.log("messages after component load",i18n.messages);
+    console.log("messages after component load ",i18n.messages);
 }
 
-/*export async function loadPageMessages (locale) {
-    //if (Object.keys(i18n.getLocaleMessage(locale)).length === 0) {
-    const messages = await import(`../lang/${locale}`);
-    console.log(store.getters.routeName,"i18n route name");
-    //const page_messages = await import(`../lang/${locale}/${store.state.route.name}`);
-    i18n.setLocaleMessage(locale, messages)
-    //}
-    if (i18n.locale !== locale) {
-        i18n.locale = locale
-    }
-}*/
-
 (async function () {
-  console.log("workisş",store.getters.locale);
+  console.log("application loaded", store.getters.locale);
   await loadMessages(store.getters.locale)
 })();
 

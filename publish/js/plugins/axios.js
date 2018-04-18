@@ -18,12 +18,12 @@ axios.interceptors.request.use(async request => {
           store.commit("update_dialog",true);
           store.commit("add_to_waiting_requests",request_identifier);
           await new Promise((resolve) => {
-              console.log(url+" bekliyor");
+              console.log(url + " waiting");
               let refreshIntervalId = setInterval(function(){
                   if(store.getters.user){
                       clearInterval(refreshIntervalId);
                       request.headers.common['Authorization'] = store.getters.token;
-                      console.log(url+" gönder");
+                      console.log(url + " sent");
                       resolve(request);
                   }
                   }, 1000);
