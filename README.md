@@ -14,7 +14,7 @@ composer require gesirdek/app-creator
 
 ### Configuration
 
-Add this to your packages.json and run `npm install`
+Add this to your package.json and run `npm install`
 
 ```json
 {
@@ -113,27 +113,48 @@ Route::get('admin/{name?}', function () {
 
 ### Database Creation
 
-Tested only on Postgre.
-
 To be able to create project from database, consider below for database design.
 
 - Table names need to be plural form except pivot table names.
 - Pivot table names must include both tables' name as singular form.
-- To implement moduler design, add module name to table comment. If you need to add a comment to any table, add double semicolon (;;) before your comment.
+- To implement modular design, add module name to table comment. If you need to add a comment to any table, add double semicolon (;;) before your comment.
+
+To be able to use modular design, add nWidart package
+
+```shell
+composer require nwidart/laravel-modules
+```
+
+After that add modules directory (`"Modules\\": "Modules/"`) to composer.json
+
+```json
+{
+"autoload": {
+        "classmap": [
+            "database/seeds",
+            "database/factories"
+        ],
+        "psr-4": {
+            "App\\": "app/",
+            "Modules\\": "Modules/"
+        }
+    },
+}
+```
 
 ### Usage
 
 Assuming you have already configured your database, you are now all set to go.
 
-- Let's scaffold some of your models from your default connection.
+- Let's scaffold some of your models from your default (mysql) connection.
 
-```shell
-php artisan code:models --connection=pgsql --schema=shop
-```
-
-If you are using mysql
 ```shell
 php artisan code:models
+```
+
+If you are using POSTGRESQL
+```shell
+php artisan code:models --connection=pgsql
 ```
 
 Then run
@@ -141,7 +162,7 @@ Then run
 npm run production
 ```
 
-Thats it! Your admin panel with DB CURD's is ready under /admin !
+Thats it! Your admin panel with DB CRUD's is ready under /admin !
 
 ### Customizing Model Scaffolding
 
