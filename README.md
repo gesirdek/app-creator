@@ -135,7 +135,7 @@ After that change add red composer
         ],
         "psr-4": {
             "App\\": "app/",
-            ![#f03c15]"Modules\\": "Modules/"`#f03c15`
+            !"Modules\\": "Modules/"
         }
     },
 ```
