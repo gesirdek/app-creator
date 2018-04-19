@@ -100,7 +100,7 @@ class Schema implements \Gesirdek\Meta\Schema
             $this->tables[$table] = $blueprint;
         }
 
-        //RouteCreator::clearExtras($this->moduleNames);
+        RouteCreator::clearExtras($this->moduleNames);
     }
 
     /**
