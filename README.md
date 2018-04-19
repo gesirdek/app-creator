@@ -106,9 +106,9 @@ php artisan config:clear
 Add this to your routes.php or web.php depending on your laravel verison.
 
 ```php
-Route::get('admin/{name?}', function () {
+Route::get('admin/{name?}', function ($name='') {
     return view('admin');
-});
+})->where('name','.*');
 ```
 
 ### Database Creation
