@@ -41,6 +41,12 @@ class RouteCreator{
     private static function putRouteApi($contents){
         File::put(base_path('routes\api.php'), $contents);
     }
+    private static function getMenuFile(){
+        return File::get(base_path('resources\assets\js\AdminApp.vue'));
+    }
+    private static function putMenuFile($contents){
+        return File::put(base_path('resources\assets\js\AdminApp.vue'), $contents);
+    }
     protected function createRoutes()
     {
         foreach ($this->moduleNames as $moduleName){
@@ -51,6 +57,7 @@ class RouteCreator{
         $this->createRoutesJs();
 
         foreach ($this->moduleNames as $moduleName){
+            self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.studly_case($moduleName).'":"'.studly_case($moduleName).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
             $this->createModulePaths($moduleName);
             $this->createFile($moduleName);
             $this->createModuleVue($moduleName);
@@ -134,8 +141,9 @@ class RouteCreator{
     }
     public static function addContent(Blueprint $blueprint){
         if(str_singular($blueprint->table()) != $blueprint->table()){
-            if($blueprint->getModuleName() != "app"){
+            if($blueprint->getModuleName() != "app"){ //Modül için burası
                 self::putModuleRoute($blueprint->getModuleStudlyCase(), str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", self::getModuleRoute($blueprint->getModuleStudlyCase())));
+                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.$blueprint->getModuleName()."-".str_replace('_','-',str_singular($blueprint->table())).'":"'.str_replace('_',' ', title_case($blueprint->table())).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
 
                 $contents = str_replace('/*{{imports}}*/', "import ".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table()))." from '../../../../Modules/".$blueprint->getModuleStudlyCase()."/Resources/assets/js/components/".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table())).".vue'\n/*{{imports}}*/", self::getRouteJs());
                 $contents = str_replace('/*{{module_content_'.$blueprint->getModuleName().'}}*/', "\t\t\t{
@@ -144,10 +152,11 @@ class RouteCreator{
                     name:'".kebab_case($blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table())))."'
                 },\n/*{{module_content_".$blueprint->getModuleName()."}}*/", $contents);
                 self::putRouteJs($contents);
-            }else{
+            }else{ //Modül dışındakiler için burası
                 $contents = str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", self::getRouteApi());
                 self::putRouteApi($contents);
 
+                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.title_case(str_replace('_','-',str_singular($blueprint->table()))).'":"'.title_case(str_replace('_',' ',str_singular($blueprint->table()))).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
                 $contents = str_replace('/*{{imports}}*/', "import ".studly_case(str_singular($blueprint->table()))." from '../components/".studly_case(str_singular($blueprint->table())).".vue'\n/*{{imports}}*/", self::getRouteJs());
                 $contents = str_replace('/*{{modulus}}*/',"\t".'{ path: \'/'.studly_case(str_singular($blueprint->table())).'\', name: \''.studly_case(str_singular($blueprint->table())).'\', component: '.studly_case(str_singular($blueprint->table())).' },'."\n/*{{modulus}}*/", $contents);
                 self::putRouteJs($contents);
