@@ -35,6 +35,11 @@ class Schema implements \Gesirdek\Meta\Schema
     protected $tables = [];
 
     /**
+     * @var
+     */
+    protected $config;
+
+    /**
      * @var array
      */
     protected $moduleNames = [];
@@ -45,10 +50,11 @@ class Schema implements \Gesirdek\Meta\Schema
      * @param string $schema
      * @param \Illuminate\Database\MySqlConnection $connection
      */
-    public function __construct($schema, $connection)
+    public function __construct($schema, $connection, $config)
     {
         $this->schema = $schema;
         $this->connection = $connection;
+        $this->config = $config;
 
         $this->load();
     }
@@ -67,7 +73,7 @@ class Schema implements \Gesirdek\Meta\Schema
      */
     protected function load()
     {
-        $tables = $this->fetchTables($this->schema);
+        $tables = array_diff($this->fetchTables($this->schema),  $this->config->getKey('except'));
         $extras = [];
         foreach ($tables as $table) {
             $extras = explode(";", $this->fetchTableComments($this->schema, $table));

@@ -42,4 +42,8 @@ class Config
 
         return $specific;
     }
+
+    public function getKey($key, $default = null){
+        return Arr::get($this->config, "*.$key", $default);
+    }
 }

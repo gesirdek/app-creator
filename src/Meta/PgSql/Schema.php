@@ -2,6 +2,7 @@
 
 namespace Gesirdek\Meta\PgSQL;
 
+use Gesirdek\Coders\Model\Config;
 use Gesirdek\Coders\Model\RouteCreator;
 use Illuminate\Support\Arr;
 use Gesirdek\Meta\Blueprint;
@@ -35,6 +36,11 @@ class Schema implements \Gesirdek\Meta\Schema
     protected $tables = [];
 
     /**
+     * @var
+     */
+    protected $config;
+
+    /**
      * @var array
      */
     protected $moduleNames = [];
@@ -45,10 +51,11 @@ class Schema implements \Gesirdek\Meta\Schema
      * @param string $schema
      * @param \Illuminate\Database\PostgresConnection $connection
      */
-    public function __construct($schema, $connection)
+    public function __construct($schema, $connection, $config)
     {
         $this->schema = $schema;
         $this->connection = $connection;
+        $this->config = $config;
 
         $this->load();
     }
@@ -67,7 +74,7 @@ class Schema implements \Gesirdek\Meta\Schema
      */
     protected function load()
     {
-        $tables = $this->fetchTables('public');
+        $tables = array_diff($this->fetchTables('public'),  $this->config->getKey('except'));
         $extras = [];
         foreach ($tables as $table) {
             $extras = explode(";", $this->fetchTableComments('public', $table));
@@ -93,7 +100,7 @@ class Schema implements \Gesirdek\Meta\Schema
             $this->tables[$table] = $blueprint;
         }
 
-        RouteCreator::clearExtras($this->moduleNames);
+        //RouteCreator::clearExtras($this->moduleNames);
     }
 
     /**
