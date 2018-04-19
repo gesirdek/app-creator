@@ -32,6 +32,12 @@ class RouteCreator{
     private static function getRouteApi(){
         return File::get(base_path('routes\api.php'));
     }
+    private static function getModuleRoute($studlymodulename){
+        return File::get(base_path('Modules\\'.$studlymodulename.'\Http\routes.php'));
+    }
+    private static function putModuleRoute($studlymodulename, $contents){
+        return File::put(base_path('Modules\\'.$studlymodulename.'\Http\routes.php'), $contents);
+    }
     private static function putRouteApi($contents){
         File::put(base_path('routes\api.php'), $contents);
     }
@@ -68,14 +74,11 @@ class RouteCreator{
     }
     protected function createFile($modulename)
     {
-        $file = base_path('Modules\\'.studly_case($modulename).'\Http\routes.php');
-        File::put($file, $this->createModuleContents($modulename));
+        self::putModuleRoute(studly_case($modulename), $this->createModuleContents($modulename));
 
-        $contents = self::getRouteJs();
         $contents = str_replace('/*{{modulus}}*/', "\t{ path: '/".studly_case($modulename)."', name: '".studly_case($modulename)."', component: ".studly_case($modulename).",
-        children: [\n/*{{module_content_".$modulename."}}*/\n\t\t]},\n/*{{modulus}}*/", $contents);
-        $contents = str_replace('/*{{imports}}*/', "import ".studly_case($modulename)." from '../../../../Modules/".studly_case($modulename)."/Resources/assets/js/components/".studly_case($modulename).".vue'\n/*{{imports}}*/", $contents);
-        self::putRouteJs($contents);
+        children: [\n/*{{module_content_".$modulename."}}*/\n\t\t]},\n/*{{modulus}}*/", self::getRouteJs());
+        self::putRouteJs(str_replace('/*{{imports}}*/', "import ".studly_case($modulename)." from '../../../../Modules/".studly_case($modulename)."/Resources/assets/js/components/".studly_case($modulename).".vue'\n/*{{imports}}*/", $contents));
     }
     protected function createModuleVue($modulename){
         $contents = "<template>\n";
@@ -101,7 +104,7 @@ class RouteCreator{
         $body = "<?php\n";
         $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
         $body .= "{\n";
-        $body .= "{{routebody}}\n";
+        $body .= "/*{{routebody}}*/\n";
         $body .= "});";
 
         return $body;
@@ -132,16 +135,9 @@ class RouteCreator{
     public static function addContent(Blueprint $blueprint){
         if(str_singular($blueprint->table()) != $blueprint->table()){
             if($blueprint->getModuleName() != "app"){
-                $file = base_path('Modules\\'.$blueprint->getModuleStudlyCase().'\Http\routes.php');
-                $contents = File::get($file);
-                $contents = str_replace('{{routebody}}', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n{{routebody}}", $contents);
-                File::put($file, $contents);
+                self::putModuleRoute($blueprint->getModuleStudlyCase(), str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", self::getModuleRoute($blueprint->getModuleStudlyCase())));
 
-                $contents = self::getRouteJs();
-                $contents = str_replace('/*{{imports}}*/', "import ".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table()))." from '../../../../Modules/".$blueprint->getModuleStudlyCase()."/Resources/assets/js/components/".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table())).".vue'\n/*{{imports}}*/", $contents);
-                self::putRouteJs($contents);
-
-                $contents = self::getRouteJs();
+                $contents = str_replace('/*{{imports}}*/', "import ".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table()))." from '../../../../Modules/".$blueprint->getModuleStudlyCase()."/Resources/assets/js/components/".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table())).".vue'\n/*{{imports}}*/", self::getRouteJs());
                 $contents = str_replace('/*{{module_content_'.$blueprint->getModuleName().'}}*/', "\t\t\t{
                     path: '".studly_case(str_singular($blueprint->table()))."',
                     component: ".$blueprint->getModuleStudlyCase().studly_case(str_singular($blueprint->table())).",
@@ -149,15 +145,10 @@ class RouteCreator{
                 },\n/*{{module_content_".$blueprint->getModuleName()."}}*/", $contents);
                 self::putRouteJs($contents);
             }else{
-                $contents = self::getRouteApi();
-                $contents = str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", $contents);
+                $contents = str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", self::getRouteApi());
                 self::putRouteApi($contents);
 
-                $contents = self::getRouteJs();
-                $contents = str_replace('/*{{imports}}*/', "import ".studly_case(str_singular($blueprint->table()))." from '../components/".studly_case(str_singular($blueprint->table())).".vue'\n/*{{imports}}*/", $contents);
-                self::putRouteJs($contents);
-
-                $contents = self::getRouteJs();
+                $contents = str_replace('/*{{imports}}*/', "import ".studly_case(str_singular($blueprint->table()))." from '../components/".studly_case(str_singular($blueprint->table())).".vue'\n/*{{imports}}*/", self::getRouteJs());
                 $contents = str_replace('/*{{modulus}}*/',"\t".'{ path: \'/'.studly_case(str_singular($blueprint->table())).'\', name: \''.studly_case(str_singular($blueprint->table())).'\', component: '.studly_case(str_singular($blueprint->table())).' },'."\n/*{{modulus}}*/", $contents);
                 self::putRouteJs($contents);
             }
@@ -165,23 +156,12 @@ class RouteCreator{
     }
     public static function clearExtras($modulenames){
         foreach ($modulenames as $modulename){
-            $file = base_path('Modules\\'.studly_case($modulename).'\Http\routes.php');
-            $contents = File::get($file);
-            $contents = str_replace('{{routebody}}', '', $contents);
-            File::put($file, $contents);
-
-            $contents = self::getRouteJs();
-            $contents = str_replace('/*{{module_content_'.$modulename.'}}*/', '', $contents);
-            self::putRouteJs($contents);
+            self::putModuleRoute(studly_case($modulename), str_replace('/*{{routebody}}*/', '', self::getModuleRoute(studly_case($modulename))));
+            self::putRouteJs(str_replace('/*{{module_content_'.$modulename.'}}*/', '', self::getRouteJs()));
         }
 
-        $contents = self::getRouteApi();
-        $contents = str_replace('/*{{routebody}}*/', '', $contents);
-        self::putRouteApi($contents);
-
-        $contents = self::getRouteJs();
-        $contents = str_replace('/*{{modulus}}*/', "\t{ path: \"*\", name: '404' , component: PageNotFound }\n", $contents);
-        $contents = str_replace('/*{{imports}}*/', '', $contents);
-        self::putRouteJs($contents);
+        self::putRouteApi(str_replace('/*{{routebody}}*/', '', self::getRouteApi()));
+        $contents = str_replace('/*{{modulus}}*/', "\t{ path: \"*\", name: '404' , component: PageNotFound }\n", self::getRouteJs());
+        self::putRouteJs(str_replace('/*{{imports}}*/', '', $contents));
     }
 }

@@ -8,6 +8,5 @@ export default async (to, from, next) => {
   }else{
     console.log("logged out");
   }
-
   return next();
 }

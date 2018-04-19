@@ -262,7 +262,7 @@ class Factory
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
 
         $template = str_replace('{{vuefilename}}', ($modulename == 'App' ? '' : studly_case($modulename)) . $model->getClassName(), $template);
-        $template = str_replace('{{vuefilenamelower}}', ($modulename == 'App' ? '' : $modulename) . str_replace('_', '', str_singular($model->getTable())), $template);
+        $template = str_replace('{{vuefilenamelower}}', strtolower(($modulename == 'App' ? '' : $modulename)).str_replace('_', '', str_singular($model->getTable())), $template);
         $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
