@@ -32,7 +32,7 @@ axios.interceptors.request.use(async request => {
   }
 
   // request.headers['X-Socket-Id'] = Echo.socketId()
-    store.commit("loading",true);
+    //store.commit("loading",true);
   return request
 });
 
