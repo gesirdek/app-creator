@@ -153,7 +153,7 @@ class RouteCreator{
                 },\n/*{{module_content_".$blueprint->getModuleName()."}}*/", $contents);
                 self::putRouteJs($contents);
             }else{ //Modül dışındakiler için burası
-                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.title_case(str_replace('_','-',str_singular($blueprint->table()))).'":"'.title_case(str_replace('_',' ',str_singular($blueprint->table()))).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
+                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.studly_case(str_singular($blueprint->table())).'":"'.title_case(str_replace('_',' ',str_singular($blueprint->table()))).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
 
                 $contents = str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", self::getRouteApi());
                 self::putRouteApi($contents);
@@ -172,5 +172,6 @@ class RouteCreator{
         self::putRouteApi(str_replace('/*{{routebody}}*/', '', self::getRouteApi()));
         $contents = str_replace('/*{{modulus}}*/', "\t{ path: \"*\", name: '404' , component: PageNotFound }\n", self::getRouteJs());
         self::putRouteJs(str_replace('/*{{imports}}*/', '', $contents));
+        self::putMenuFile(str_replace('/*{{menucontent}}*/','', self::getMenuFile()));
     }
 }
