@@ -8,7 +8,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
               rel="stylesheet">
 
-        <title>BUKart</title>
+        <title>App Name</title>
     </head>
     <body>
         <div id="app"></div>
