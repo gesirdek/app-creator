@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Ertan Çoban
- * Date: 10.04.2018
- * Time: 10:02
- */
 
 namespace Gesirdek\Coders\Model;
 
@@ -24,28 +18,28 @@ class RouteCreator{
         $this->createRoutes();
     }
     private static function getRouteJs(){
-        return File::get(base_path('resources\assets\js\router\routes.js'));
+        return File::get(base_path('resources/assets/js/router/routes.js'));
     }
     private static function putRouteJs($contents){
-        File::put(base_path('resources\assets\js\router\routes.js'), $contents);
+        File::put(base_path('resources/assets/js/router/routes.js'), $contents);
     }
     private static function getRouteApi(){
-        return File::get(base_path('routes\api.php'));
+        return File::get(base_path('routes/api.php'));
     }
     private static function getModuleRoute($studlymodulename){
-        return File::get(base_path('Modules\\'.$studlymodulename.'\Http\routes.php'));
+        return File::get(base_path('Modules/'.$studlymodulename.'/Http/routes.php'));
     }
     private static function putModuleRoute($studlymodulename, $contents){
-        return File::put(base_path('Modules\\'.$studlymodulename.'\Http\routes.php'), $contents);
+        return File::put(base_path('Modules/'.$studlymodulename.'/Http/routes.php'), $contents);
     }
     private static function putRouteApi($contents){
-        File::put(base_path('routes\api.php'), $contents);
+        File::put(base_path('routes/api.php'), $contents);
     }
     private static function getMenuFile(){
-        return File::get(base_path('resources\assets\js\AdminApp.vue'));
+        return File::get(base_path('resources/assets/js/AdminApp.vue'));
     }
     private static function putMenuFile($contents){
-        return File::put(base_path('resources\assets\js\AdminApp.vue'), $contents);
+        return File::put(base_path('resources/assets/js/AdminApp.vue'), $contents);
     }
     protected function createRoutes()
     {
@@ -64,13 +58,13 @@ class RouteCreator{
         }
     }
     protected function createModulePaths($modulename){
-        if (!is_dir(base_path('Modules\\'.studly_case($modulename).'\Resources\assets\js'))) {
+        if (!is_dir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js'))) {
             // dir doesn't exist, make it
-            mkdir(base_path('Modules\\'.studly_case($modulename).'\Resources\assets\js'));
+            mkdir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js'));
         }
-        if (!is_dir(base_path('Modules\\'.studly_case($modulename).'\Resources\assets\js\components'))) {
+        if (!is_dir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js/components'))) {
             // dir doesn't exist, make it
-            mkdir(base_path('Modules\\'.studly_case($modulename).'\Resources\assets\js\components'));
+            mkdir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js/components'));
         }
     }
     protected function createMainApiRoutes(){
@@ -103,13 +97,13 @@ class RouteCreator{
         $contents .="\t\t}\n";
         $contents .="</script>";
 
-        $file = base_path('Modules\\'.studly_case($modulename).'\Resources\assets\js\components\\'.studly_case($modulename).'.vue');
+        $file = base_path('Modules/'.studly_case($modulename).'/Resources/assets/js/components/'.studly_case($modulename).'.vue');
         File::put($file, $contents);
     }
     protected function createModuleContents($modulename)
     {
         $body = "<?php\n";
-        $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
+        $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules/".studly_case($modulename)."/Http/Controllers'], function()\n";
         $body .= "{\n";
         $body .= "/*{{routebody}}*/\n";
         $body .= "});";
