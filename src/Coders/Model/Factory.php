@@ -299,6 +299,11 @@ class Factory
                 }
             }
         }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= '{list:\''.$constraint->name().'\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',str_singular($constraint->name())).'\'}, ';
+            }
+        }
 
         return $body;
     }
@@ -316,6 +321,11 @@ class Factory
                 if(str_is('*_id',$property)){
                     $body.= "\t\t".substr($property,0,-2).'list : [],'."\r\n";
                 }
+            }
+        }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body.= "\t\t".$constraint->name().' : [],'."\r\n";
             }
         }
 
@@ -461,6 +471,11 @@ class Factory
                 $body .='"'.$vfilename.'.'.$property.'", ';
             }
         }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .='"'.$vfilename.'.'.$constraint->name().'", ';
+            }
+        }
 
         return $body;
     }
@@ -475,6 +490,11 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 $body .= $property.':\'\',';
+            }
+        }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= $constraint->name().': [],';
             }
         }
 
