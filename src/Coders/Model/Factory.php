@@ -303,6 +303,11 @@ class Factory
                 }
             }
         }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= '{list:\''.$constraint->name().'\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',str_singular($constraint->name())).'\'}, ';
+            }
+        }
 
         return $body;
     }
@@ -320,6 +325,11 @@ class Factory
                 if(str_is('*_id',$property)){
                     $body.= "\t\t".substr($property,0,-2).'list : [],'."\r\n";
                 }
+            }
+        }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body.= "\t\t".$constraint->name().' : [],'."\r\n";
             }
         }
 
@@ -413,6 +423,8 @@ class Factory
                 $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
                 $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$constraint->name().'\')"'."\r\n";
                 $body .= "\t\t\t\t".'required'."\r\n";
+                $body .= "\t\t\t\t".'multiple'."\r\n";
+                $body .= "\t\t\t\t".'autocomplete'."\r\n";
                 $body .= "\t\t\t".'></v-select>'."\r\n";
             }
         }
@@ -430,7 +442,7 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(Str::contains($property,'_id')){
-                    $body .= "\t\t".'<td>{{ '.substr($property,0,-2).'list.filter(function( a ) { return a.id === props.item.'.$property.'; })[0].name }}</td>'."\r\n";
+                    $body .= "\t\t".'<td><span v-for="r in '.substr($property,0,-2).'list" v-if="props.item.'.$property.' === r.id">{{ r.name }}</span></td>'."\r\n";
                 }else{
                     $body .= "\t\t".'<td>{{ props.item.'.$property.' }}</td>'."\r\n";
                 }
@@ -465,6 +477,11 @@ class Factory
                 $body .='"'.$vfilename.'.'.$property.'", ';
             }
         }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .='"'.$vfilename.'.'.$constraint->name().'", ';
+            }
+        }
 
         return $body;
     }
@@ -479,6 +496,11 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 $body .= $property.':\'\',';
+            }
+        }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= $constraint->name().': [],';
             }
         }
 
@@ -683,9 +705,6 @@ class Factory
         if (! $model->usesTimestamps()) {
             $body .= $this->class->field('timestamps', false, ['visibility' => 'public']);
         }
-        /*else{
-            $body .= "\n\t".'protected $dateFormat = \'Y-m-d H:i:sO\';'."\n";
-        }*/
 
         if ($model->hasCustomDateFormat()) {
             $body .= $this->class->field('dateFormat', $model->getDateFormat());

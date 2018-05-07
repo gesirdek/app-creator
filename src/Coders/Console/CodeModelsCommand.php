@@ -60,7 +60,7 @@ class CodeModelsCommand extends Command
 
         // Check whether we just need to generate one table
         if ($table) {
-            $this->models->on($connection)->create($schema, $table);
+            $this->models->on($connection)->create($schema, $table,'app');
             $this->info("Check out your models for $table");
         }
 
