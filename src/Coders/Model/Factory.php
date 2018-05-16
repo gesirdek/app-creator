@@ -295,7 +295,11 @@ class Factory
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
-                    $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                    if(str_is('*able_id',$property)!==false){
+                        $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',substr($property,0,-7)).'\'}, ';
+                    }else{
+                        $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                    }
                 }
             }
         }
