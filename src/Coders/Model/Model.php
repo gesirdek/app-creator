@@ -1088,6 +1088,8 @@ class Model
      */
     public function getRelations()
     {
+        if($this->getTable()=='roles' && config('models.*.user_management'))
+            return [];
         return $this->relations;
     }
 

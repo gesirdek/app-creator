@@ -31,7 +31,7 @@ class CodersServiceProvider extends ServiceProvider
                 __DIR__ . '/../../publish/base/webpack.mix.js' => base_path('webpack.mix.js'),
                 __DIR__ . '/../../publish/views/admin.blade.php' => resource_path('views/admin.blade.php'),
             ], 'gesirdek-models');
-            $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+            //$this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
             $this->commands([
                 CodeModelsCommand::class,

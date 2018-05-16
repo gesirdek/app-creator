@@ -24,7 +24,11 @@ class CreateRoleUserTable extends Migration
                 ->on('users');
 
             $table->timestamps();
-            $table->engine = 'InnoDB';
+            if(config('database.connections.'.config('database.default').'.driver') == 'mysql'){
+                $table->engine = 'InnoDB';
+            }
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
         });
     }
 
@@ -35,6 +39,6 @@ class CreateRoleUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('role_user');
+        //
     }
 }

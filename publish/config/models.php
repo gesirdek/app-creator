@@ -281,7 +281,8 @@ return [
 
         'except' => [
             'migrations',
-            'password_resets'
+            'password_resets',
+            'permissions'
         ],
 
         /*
@@ -387,7 +388,23 @@ return [
         */
         'override_pluralize_for' => [
 
-        ]
+        ],
+
+        /*
+         * Do you want user management
+         */
+        'user_management' => true,
+
+        /*
+         * Define User Identifier Column in users table
+         * Eg: email,username,full_name
+         */
+        'user_identifier_string' => 'name',
+
+        /*
+         * Define admin user id
+         */
+        'admin_id' => '1'
     ],
 
     /*

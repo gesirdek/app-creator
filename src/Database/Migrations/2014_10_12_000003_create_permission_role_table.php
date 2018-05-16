@@ -24,7 +24,11 @@ class CreatePermissionRoleTable extends Migration
                 ->on('permissions');
 
             $table->timestamps();
-            $table->engine = 'InnoDB';
+            if(config('database.connections.'.config('database.default').'.driver') == 'mysql'){
+                $table->engine = 'InnoDB';
+            }
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
         });
     }
 
@@ -35,6 +39,9 @@ class CreatePermissionRoleTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('role_user');
         Schema::dropIfExists('permission_role');
+        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('roles');
     }
 }

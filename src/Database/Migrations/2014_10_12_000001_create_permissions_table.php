@@ -18,7 +18,11 @@ class CreatePermissionsTable extends Migration
             $table->string('name');
             $table->string('route',230)->unique();
             $table->timestamps();
-            $table->engine = 'InnoDB';
+            if(config('database.connections.'.config('database.default').'.driver') == 'mysql'){
+                $table->engine = 'InnoDB';
+            }
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
         });
     }
 
@@ -29,6 +33,6 @@ class CreatePermissionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permissions');
+        //
     }
 }

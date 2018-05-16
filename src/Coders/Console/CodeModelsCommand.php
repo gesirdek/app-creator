@@ -5,6 +5,8 @@ namespace Gesirdek\Coders\Console;
 use Illuminate\Console\Command;
 use Gesirdek\Coders\Model\Factory;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 class CodeModelsCommand extends Command
 {
@@ -54,6 +56,11 @@ class CodeModelsCommand extends Command
      */
     public function handle()
     {
+        $this->createPermissions();
+        exit;
+        if(config('models.*.user_management')){
+            Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
+        }
         $connection = $this->getConnection();
         $schema = $this->getSchema($connection);
         $table = $this->getTable();
@@ -68,6 +75,9 @@ class CodeModelsCommand extends Command
         else {
             $this->models->on($connection, $schema)->map($schema);
             $this->info("Check out your models for $schema");
+        }
+        if(config('models.*.user_management')){
+            $this->createPermissions();
         }
     }
 
@@ -95,5 +105,21 @@ class CodeModelsCommand extends Command
     protected function getTable()
     {
         return $this->option('table');
+    }
+
+    /*
+     * @return boolean
+     */
+    protected function createPermissions(){
+        $routeCollection = Route::getRoutes();
+
+        foreach ($routeCollection as $value) {
+            if(isset($value->action["controller"])){
+                //echo $value->action["controller"];
+            }
+            else{
+                dd($value->action);
+            }
+        }
     }
 }

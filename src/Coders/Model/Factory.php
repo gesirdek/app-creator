@@ -639,7 +639,7 @@ class Factory
             if ($model->hasProperty($name)) {
                 continue;
             }
-            $annotations .= $this->class->annotation('property', $relation->hint()." \$$name");
+            $annotations .= $this->class->annotation('property', str_replace("\Modules\App","\App",$relation->hint())." \$$name");
         }
 
         return $annotations;
