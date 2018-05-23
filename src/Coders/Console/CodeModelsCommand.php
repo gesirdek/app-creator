@@ -56,8 +56,8 @@ class CodeModelsCommand extends Command
      */
     public function handle()
     {
-        $this->createPermissions();
-        exit;
+        /*$this->createPermissions();
+        exit;*/
         if(config('models.*.user_management')){
             Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
         }
@@ -76,6 +76,7 @@ class CodeModelsCommand extends Command
             $this->models->on($connection, $schema)->map($schema);
             $this->info("Check out your models for $schema");
         }
+        exit;
         if(config('models.*.user_management')){
             $this->createPermissions();
         }
@@ -112,13 +113,11 @@ class CodeModelsCommand extends Command
      */
     protected function createPermissions(){
         $routeCollection = Route::getRoutes();
-
         foreach ($routeCollection as $value) {
             if(isset($value->action["controller"])){
+                //$permission = new Permission();
                 //echo $value->action["controller"];
-            }
-            else{
-                dd($value->action);
+                //exit;
             }
         }
     }
