@@ -1,12 +1,8 @@
 <?php
 
-/**
- * Created by BİM Web Birimi.
- * Date: {{date}}.
- */
-
 namespace {{namespacemodel}};
 use Illuminate\Database\Eloquent\Model;
+{{relatednamespaces}}
 
 /**
  * Class {{class}}

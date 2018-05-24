@@ -2,10 +2,12 @@
 
 namespace Gesirdek\Coders\Console;
 
+use App\Entities\Permission;
 use Illuminate\Console\Command;
 use Gesirdek\Coders\Model\Factory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 class CodeModelsCommand extends Command
@@ -76,7 +78,6 @@ class CodeModelsCommand extends Command
             $this->models->on($connection, $schema)->map($schema);
             $this->info("Check out your models for $schema");
         }
-        exit;
         if(config('models.*.user_management')){
             $this->createPermissions();
         }
@@ -87,7 +88,7 @@ class CodeModelsCommand extends Command
      */
     protected function getConnection()
     {
-        return $this->option('connection') ?: $this->config->get('database.default');
+        return $this->config->get('database.default');
     }
 
     /**
@@ -97,7 +98,7 @@ class CodeModelsCommand extends Command
      */
     protected function getSchema($connection)
     {
-        return $this->option('schema') ?: $this->config->get("database.connections.$connection.database");
+        return $this->config->get("database.connections.$connection.database");
     }
 
     /**
@@ -115,9 +116,36 @@ class CodeModelsCommand extends Command
         $routeCollection = Route::getRoutes();
         foreach ($routeCollection as $value) {
             if(isset($value->action["controller"])){
-                //$permission = new Permission();
-                //echo $value->action["controller"];
-                //exit;
+                DB::transaction(function() use ($value)
+                {
+                    $permission=DB::table('permissions');
+                    if($permission->where('route',$value->action["controller"])->exists()){
+
+                    }else{
+                        $exploded=explode('\\',$value->action["controller"]);
+                        $permission->insert([
+                            'route'=>$value->action["controller"],
+                            'name'=> $exploded[count($exploded)-1],
+                            "created_at" =>  \Carbon\Carbon::now(),
+                            "updated_at" => \Carbon\Carbon::now(),
+                        ]);
+                    }
+                    $role=DB::table('roles');
+                    if($role->count() == 0){
+                        $role_id=$role->insertGetId([
+                            'name'=>'admin',
+                            "created_at" =>  \Carbon\Carbon::now(),
+                            "updated_at" => \Carbon\Carbon::now()
+                        ]);
+                        $role_user=DB::table('role_user');
+                        $role_user->insert([
+                            'role_id'=>$role_id,
+                            'user_id'=>config('models.*.admin_id'),
+                            "created_at" =>  \Carbon\Carbon::now(),
+                            "updated_at" => \Carbon\Carbon::now()
+                        ]);
+                    }
+                });
             }
         }
     }

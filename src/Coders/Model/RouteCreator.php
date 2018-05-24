@@ -103,7 +103,7 @@ class RouteCreator{
     protected function createModuleContents($modulename)
     {
         $body = "<?php\n";
-        $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules/".studly_case($modulename)."/Http/Controllers'], function()\n";
+        $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
         $body .= "{\n";
         $body .= "/*{{routebody}}*/\n";
         $body .= "});";

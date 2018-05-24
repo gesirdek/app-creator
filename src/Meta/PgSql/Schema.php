@@ -304,12 +304,19 @@ WHERE c.relkind = \'r\'::char
             }else{
                 $combinedTables[] = $tableName;
                 $combinedColumns[] = ",".$columnNames[$index];
+                if(!isset($referenceids[$index])){
+                    continue;
+                }
                 $combinedReferences[] = $this->getReference($referenceids[$index], $tableName);
             }
         }
 
 
         foreach ($combinedTables as $index => $combinedTable) {
+            if(!isset($combinedReferences[$index])){
+                unset($combinedTables[$index]);
+                continue;
+            }
             $table = $this->resolveForeignTable($combinedTables[$index], $blueprint);
 
             $relation = [
@@ -380,6 +387,7 @@ WHERE c.relkind = \'r\'::char
      */
     public static function schemas(Connection $connection)
     {
+
         $schemas = $connection->getDoctrineSchemaManager()->listDatabases();
 
         return array_diff($schemas, [

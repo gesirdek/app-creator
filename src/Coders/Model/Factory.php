@@ -91,11 +91,13 @@ class Factory
      * Select connection to work with.
      *
      * @param string $connection
+     * @param string $schema
      *
      * @return $this
      */
     public function on($connection = null, $schema = '')
     {
+
         $this->schemas = new SchemaManager($this->db->connection($connection), $schema, $this->config);
 
         return $this;
@@ -155,6 +157,7 @@ class Factory
      */
     public function createFiles($model, $moduleName)
     {
+        echo $model->getTable()."\n";
         $moduleTitle = studly_case($moduleName);
         $namespaces = [];
         $namespaceMain = ($moduleTitle == 'App' ? 'App' : 'Modules\\'.$moduleTitle);
@@ -260,6 +263,7 @@ class Factory
         $template = str_replace('{{namespacemodel}}', $namespaces[0], $template);
         $template = str_replace('{{namespacerequest}}', $namespaces[1], $template);
         $template = str_replace('{{namespacecontroller}}', $namespaces[2], $template);
+        $template = str_replace('{{relatednamespaces}}', $this->getRelatedNamespaces($model), $template);
 
         $template = str_replace('{{vuefilename}}', ($modulename == 'App' ? '' : studly_case($modulename)) . $model->getClassName(), $template);
         $template = str_replace('{{vuefilenamelower}}', strtolower(($modulename == 'App' ? '' : $modulename)).str_replace('_', '', str_singular($model->getTable())), $template);
@@ -306,6 +310,37 @@ class Factory
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
                 $body .= '{list:\''.$constraint->name().'\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',str_singular($constraint->name())).'\'}, ';
+            }
+        }
+
+        return $body;
+    }
+    /**
+     * @param \Gesirdek\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getRelatedNamespaces(Model $model){
+        $body = "";
+        foreach ($model->getRelations() as $constraint) {
+            var_dump($model->getTable(),$constraint->name());
+            if($model->getTable() == str_plural($constraint->name())){
+                continue;
+            }
+
+            if(str_contains($constraint->hint(),'|')){
+                $hint=explode('|',$constraint->hint())[1];
+            }else{
+                $hint=$constraint->hint();
+            }
+
+            if(str_contains($hint,'Modules\App\\')){
+                $body .= "use ".substr(substr($hint,9),0,-2).";\n";
+            }
+            elseif(str_contains($hint,'|')){
+                $body .= "use ".substr(substr($hint,1),0,-2).";\n";
+            }else{
+                $body .= "use ".$hint.";\n";
             }
         }
 
