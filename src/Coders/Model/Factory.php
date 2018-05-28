@@ -323,7 +323,6 @@ class Factory
     protected function getRelatedNamespaces(Model $model){
         $body = "";
         foreach ($model->getRelations() as $constraint) {
-            var_dump($model->getTable(),$constraint->name());
             if($model->getTable() == str_plural($constraint->name())){
                 continue;
             }
@@ -337,10 +336,14 @@ class Factory
             if(str_contains($hint,'Modules\App\\')){
                 $body .= "use ".substr(substr($hint,9),0,-2).";\n";
             }
-            elseif(str_contains($hint,'|')){
+        elseif(str_contains($hint,'|')){
                 $body .= "use ".substr(substr($hint,1),0,-2).";\n";
             }else{
-                $body .= "use ".$hint.";\n";
+                if(substr($hint,-2)==='[]'){
+                    $body .= "use ".substr($hint,0,-2).";\n";
+                }else{
+                    $body .= "use ".$hint.";\n";
+                }
             }
         }
 
