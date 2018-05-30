@@ -44,7 +44,7 @@ class ModelManager implements IteratorAggregate
     public function make($schema, $table, $mutators = [], $withRelations = true)
     {
         $mapper = $this->factory->makeSchema($schema);
-
+        
         $blueprint = $mapper->table($table);
 
         if (Arr::has($this->models, $blueprint->qualifiedTable())) {

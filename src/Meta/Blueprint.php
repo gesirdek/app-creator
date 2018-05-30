@@ -37,6 +37,11 @@ class Blueprint
     protected $morphToMany;
 
     /**
+     * @var string
+     */
+    protected $morphTable;
+
+    /**
      * @var \Illuminate\Support\Fluent[]
      */
     protected $columns = [];
@@ -79,7 +84,8 @@ class Blueprint
             $this->morphToMany = "none";
         }elseif(count($extras) == 2){
             $this->module = $extras[0];
-            $this->morphToMany = $extras[1];
+            $this->morphToMany = "filled";
+            $this->morphTable = explode('.', explode('|',$extras[1])[0])[0];
         }else{
             $this->module = "app";
             $this->morphToMany = "none";
@@ -108,6 +114,22 @@ class Blueprint
     public function getModuleName()
     {
         return $this->module;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMorphStatus()
+    {
+        return ($this->morphToMany != 'none');
+    }
+
+    /**
+     * @return string
+     */
+    public function getMorphTable()
+    {
+        return $this->morphTable;
     }
 
     /**

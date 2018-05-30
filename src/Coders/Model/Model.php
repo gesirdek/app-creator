@@ -7,6 +7,8 @@
 
 namespace Gesirdek\Coders\Model;
 
+use Gesirdek\Coders\Model\Relations\MorphTo;
+use Gesirdek\Coders\Model\Relations\MorphedByMany;
 use Illuminate\Support\Str;
 use Gesirdek\Meta\Blueprint;
 use Illuminate\Support\Fluent;
@@ -253,9 +255,16 @@ class Model
         }
 
         foreach ($this->blueprint->relations() as $relation) {
-            $model = $this->makeRelationModel($relation);
-            $belongsTo = new BelongsTo($relation, $this, $model);
-            $this->relations[$belongsTo->name()] = $belongsTo;
+            if($relation->getAttributes()['name'] == 'morph'){
+                $model = $this->makeRelationModel($relation);
+                $belongsTo = new MorphTo($relation, $this, $model);
+                $this->relations[$belongsTo->name()] = $belongsTo;
+            }else{
+                $model = $this->makeRelationModel($relation);
+                $belongsTo = new BelongsTo($relation, $this, $model);
+                $this->relations[$belongsTo->name()] = $belongsTo;
+            }
+
         }
 
         foreach ($this->factory->referencing($this) as $related) {

@@ -198,6 +198,18 @@ WHERE c.relkind = \'r\'::char
         $foreignKeys = array();
         $foreignKeyTables = array();
         $foreignTableColumns = array();
+        $morphedByTables = array();
+        //$morphToTable = "";
+        $tableComments = array();
+
+
+        $tableComments = explode(';',$this->fetchTableComments('public',$blueprint->table()));
+        if(isset($tableComments[1])){
+            if($tableComments[1] != null && $tableComments[1] != ''){
+                //$morphToTable = explode(',', explode('|', $tableComments[1])[0]);
+                $morphedByTables = explode(',', explode('|', $tableComments[1])[1]);
+            }
+        }
 
         foreach ($rows as $row){
             if($row['primarykey'] == 't'){
@@ -224,6 +236,11 @@ WHERE c.relkind = \'r\'::char
         if(count($foreignKeys) > 0){
             $this->fillRelations($foreignKeys, $foreignKeyTables, $foreignTableColumns, $blueprint);
         }
+
+        if(count($morphedByTables) > 0){
+            $this->fillMorphRelations($morphedByTables, $blueprint);
+        }
+
     }
 
     /**
@@ -329,6 +346,39 @@ WHERE c.relkind = \'r\'::char
 
             $blueprint->withRelation(new Fluent($relation));
         }
+    }
+
+    /**
+     * @param string $sql
+     * @param \Gesirdek\Meta\Blueprint $blueprint
+     * @todo: Support named foreign keys
+     */
+    protected function fillMorphRelations($morphBy, Blueprint $blueprint)
+    {
+
+        $refTables = array();
+        $refColumns = array();
+        foreach ($morphBy as $index => $morphByTable) {
+            $refTables[] = explode('.',$morphByTable)[0];
+            $refColumns[] = explode('.',$morphByTable)[1];
+
+            $table = $this->resolveForeignTable($refTables[$index], $blueprint);
+
+            $relation = [
+                'name' => 'morph',
+                'index' => '',
+                'columns' => $this->columnize($refColumns[$index]),
+                'references' => $this->columnize($refTables[$index]),
+                'on' => $table,
+            ];
+
+            $blueprint->withRelation(new Fluent($relation));
+        }
+
+
+
+
+        //dd($blueprint->relations());
     }
 
     /**
