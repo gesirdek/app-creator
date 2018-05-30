@@ -16,7 +16,7 @@ use Gesirdek\Coders\Model\Model;
 use Gesirdek\Coders\Model\Relation;
 use Illuminate\Database\Eloquent\Collection;
 
-class MorphedMany implements Relation
+class MorphToMany implements Relation
 {
     /**
      * @var \Illuminate\Support\Fluent
@@ -94,7 +94,7 @@ class MorphedMany implements Relation
     {
         $body = '$this->morphToMany(';
 
-        $body .= $this->reference->getClassName()."::class,'".$this->parent->getBlueprint()->getMorphTable()."');";
+        $body .= $this->reference->getClassName()."::class,'".$this->reference->getBlueprint()->getMorphTable()."');";
 
         return $body;
     }

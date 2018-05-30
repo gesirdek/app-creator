@@ -257,7 +257,7 @@ class Model
         foreach ($this->blueprint->relations() as $relation) {
             if($relation->getAttributes()['name'] == 'morph'){
                 $model = $this->makeRelationModel($relation);
-                $belongsTo = new MorphTo($relation, $this, $model);
+                $belongsTo = new MorphedByMany($relation, $this, $model);
                 $this->relations[$belongsTo->name()] = $belongsTo;
             }else{
                 $model = $this->makeRelationModel($relation);
@@ -268,10 +268,12 @@ class Model
         }
 
         foreach ($this->factory->referencing($this) as $related) {
-            $factory = new ReferenceFactory($related, $this);
-            $references = $factory->make();
-            foreach ($references as $reference) {
-                $this->relations[$reference->name()] = $reference;
+            if(!$this->getBlueprint()->getMorphStatus()){
+                $factory = new ReferenceFactory($related, $this);
+                $references = $factory->make();
+                foreach ($references as $reference) {
+                    $this->relations[$reference->name()] = $reference;
+                }
             }
         }
     }

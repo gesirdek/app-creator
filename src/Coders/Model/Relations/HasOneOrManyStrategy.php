@@ -27,9 +27,10 @@ class HasOneOrManyStrategy implements Relation
      */
     public function __construct(Fluent $command, Model $parent, Model $related)
     {
-        if($related->getBlueprint()->getMorphStatus()){
-            $this->relation = new MorphedMany($parent, $related);
-        }else{
+        if($related->getBlueprint()->getMorphStatus()) {
+            $this->relation = new MorphToMany($parent, $related);
+        }else
+        {
             if (
                 $related->isPrimaryKey($command) ||
                 $related->isUniqueKey($command)

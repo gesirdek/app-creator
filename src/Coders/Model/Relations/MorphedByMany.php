@@ -13,7 +13,7 @@ use Illuminate\Support\Fluent;
 use Gesirdek\Coders\Model\Model;
 use Gesirdek\Coders\Model\Relation;
 
-class MorphTo implements Relation
+class MorphedByMany implements Relation
 {
     /**
      * @var \Illuminate\Support\Fluent
