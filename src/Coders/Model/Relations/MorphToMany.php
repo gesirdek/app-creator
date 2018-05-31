@@ -94,7 +94,7 @@ class MorphToMany implements Relation
     {
         $body = 'return $this->morphToMany(';
 
-        $body .= $this->reference->getClassName()."::class,'".$this->reference->getBlueprint()->getMorphTable()."');";
+        $body .= $this->reference->getClassName()."::class,'".$this->reference->getBlueprint()->getMorphColumn()."','".$this->reference->getBlueprint()->getMorphTable()."');";
 
         return $body;
     }

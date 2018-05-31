@@ -42,6 +42,11 @@ class Blueprint
     protected $morphTable;
 
     /**
+     * @var string
+     */
+    protected $morphColumn;
+
+    /**
      * @var \Illuminate\Support\Fluent[]
      */
     protected $columns = [];
@@ -86,6 +91,7 @@ class Blueprint
             $this->module = $extras[0];
             $this->morphToMany = "filled";
             $this->morphTable = explode('.', explode('|',$extras[1])[0])[0];
+            $this->morphColumn = explode('.', explode('|',$extras[1])[0])[1];
         }else{
             $this->module = "app";
             $this->morphToMany = "none";
@@ -130,6 +136,14 @@ class Blueprint
     public function getMorphTable()
     {
         return $this->morphTable;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMorphColumn()
+    {
+        return $this->morphColumn;
     }
 
     /**

@@ -73,7 +73,7 @@ class MorphedByMany implements Relation
     {
         $body = 'return $this->morphedByMany(';
 
-        $body .= $this->related->getClassName().'::class,'."'".$this->parent->getBlueprint()->getMorphTable()."');";
+        $body .= $this->related->getClassName()."::class,'".$this->parent->getBlueprint()->getMorphColumn()."','".$this->parent->getBlueprint()->getMorphTable()."');";
 
         return $body;
 
