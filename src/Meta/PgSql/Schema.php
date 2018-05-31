@@ -121,7 +121,7 @@ class Schema implements \Gesirdek\Meta\Schema
      *
      * @return array
      */
-    protected function fetchTableComments($schema, $table)
+    public function fetchTableComments($schema, $table)
     {
         $rows = $this->arraify($this->connection->select('SELECT obj_description(\''.$schema.'.'.$table.'\'::regclass)'));
         return $rows[0]['obj_description'];

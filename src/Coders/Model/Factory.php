@@ -8,6 +8,8 @@
 namespace Gesirdek\Coders\Model;
 
 use Carbon\Carbon;
+use Gesirdek\Meta\PgSQL\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Gesirdek\Meta\Blueprint;
 use Gesirdek\Support\Classify;
@@ -288,6 +290,19 @@ class Factory
         return $template;
     }
 
+    protected function getModelFromTable($table)
+    {
+        foreach( get_declared_classes() as $class ) {
+            if( is_subclass_of( $class, 'Illuminate\Database\Eloquent\Model' ) ) {
+                $model = new $class;
+                if ($model->getTable() === $table)
+                    return $class;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param \Gesirdek\Coders\Model\Model $model
      *
@@ -300,20 +315,63 @@ class Factory
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
                     if(str_is('*able_id',$property)!==false){
-                        $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',substr($property,0,-7)).'\'}, ';
+                        $table_name=str_plural(substr($property,0,-7));
+                        $route_module_part = $this->getModuleNameOfRelated($table_name);
+                        $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$route_module_part.str_replace('_','-',substr($property,0,-7)).'\'}, ';
                     }else{
-                        $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',substr($property,0,-3)).'\'}, ';
+                        $table_name=str_plural(substr($property,0,-3));
+                        $route_module_part = $this->getModuleNameOfRelated($table_name);
+                        $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$route_module_part.str_replace('_','-',substr($property,0,-3)).'\'}, ';
                     }
                 }
             }
         }
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= '{list:\''.$constraint->name().'\',source:\'/'.($model->getBlueprint()->getModuleName() == 'app' ? 'api' : 'api/'.kebab_case($model->getBlueprint()->getModuleName())).'/'.str_replace('_','-',str_singular($constraint->name())).'\'}, ';
+                $table_name = str_plural($constraint->name());
+                $route_module_part = $this->getModuleNameOfRelated($table_name);
+                $body .= '{list:\''.$constraint->name().'\',source:\'/api/'.$route_module_part.str_replace('_','-',str_singular($constraint->name())).'\'}, ';
             }
         }
 
         return $body;
+    }
+
+    protected function getModelsInFolder($paths){
+        $out = [];
+        foreach ($paths as $path){
+            $results = scandir($path);
+            foreach ($results as $result) {
+                if ($result === '.' or $result === '..') continue;
+                $filename = $path . '/' . $result;
+                if (is_dir($filename)) {
+                    $out = array_merge($out, $this->getModelsInFolder([$filename]));
+                }else{
+                    $class_name = str_replace('/','\\',ucfirst(substr(str_replace(base_path(),'',substr($filename,0,-4)),1)));
+                    if(is_subclass_of( $class_name, 'Illuminate\Database\Eloquent\Model' )){
+                        $out[] = $class_name;
+                    }
+                }
+            }
+        }
+        return $out;
+    }
+
+    protected function getModuleNameOfRelated($table_name){
+        $entity_classes = $this->getModelsInFolder([
+            app_path().'/Entities',
+            base_path().'/Modules']);
+        foreach ($entity_classes as $entity_class){
+            $EC = new $entity_class();
+            if($EC->getTable() == $table_name){
+                $parsed_ec = explode('\\',$entity_class);
+                if($parsed_ec[0] === 'Modules'){
+                    return str_slug($parsed_ec[1]).'/';
+                }else{
+                    return '';
+                }
+            }
+        }
     }
     /**
      * @param \Gesirdek\Coders\Model\Model $model
