@@ -92,7 +92,7 @@ class MorphToMany implements Relation
      */
     public function body()
     {
-        $body = '$this->morphToMany(';
+        $body = 'return $this->morphToMany(';
 
         $body .= $this->reference->getClassName()."::class,'".$this->reference->getBlueprint()->getMorphTable()."');";
 
