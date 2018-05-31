@@ -120,7 +120,7 @@ class Schema implements \Gesirdek\Meta\Schema
      *
      * @return array
      */
-    protected function fetchTableComments($schema, $table)
+    public function fetchTableComments($schema, $table)
     {
         $rows = $this->arraify($this->connection
             ->select('SELECT `TABLE_COMMENT` FROM information_schema.tables  
