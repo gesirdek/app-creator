@@ -275,6 +275,7 @@ class Factory
         $template = str_replace('{{props}}', $this->getVueModelProps($model), $template);
         $template = str_replace('{{vuefields}}', $this->getVueFields($model), $template);
         $template = str_replace('{{lists}}', $this->getVueLists($model), $template);
+        $template = str_replace('{{datetime_modals}}', $this->getVueDatetimeModals($model), $template);
         $template = str_replace('{{listdata}}', $this->getVueListData($model), $template);
         $template = str_replace('{{lowerclass}}', str_replace('_', '-', str_singular($model->getTable())), $template);
         $template = str_replace('{{modulename}}', ($modulename == 'App' ? 'api' : 'api/' . kebab_case($modulename)), $template);
@@ -471,10 +472,31 @@ class Factory
                 }else if($dataType == 'integer'){
                     $body .= "\t\t\t".'\''.$property.'\'=>\'required|integer\','."\n";
                 }*/else if($dataType == '\Carbon\Carbon') {
-                    $body .= "\t\t\t".'<v-date-picker'."\r\n";
-                    $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
-                    $body .= "\t\t\t\t".':locale="store.getters.locale"'."\r\n";
-                    $body .= "\t\t\t".'></v-date-picker>'."\r\n";
+                    $body .= "\t\t\t<v-menu\r\n";
+					$body .= "\t\t\t\t".'ref="'.$property.'"'."\r\n";
+					$body .= "\t\t\t\t".':close-on-content-click="false"'."\r\n";
+					$body .= "\t\t\t\t".'v-model="'.$property.'_modal"'."\r\n";
+					$body .= "\t\t\t\t".':nudge-right="40"'."\r\n";
+					$body .= "\t\t\t\t".':return-value.sync="item.'.$property.'"'."\r\n";
+					$body .= "\t\t\t\t".'lazy'."\r\n";
+					$body .= "\t\t\t\t".'transition="scale-transition"'."\r\n";
+					$body .= "\t\t\t\t".'offset-y'."\r\n";
+					$body .= "\t\t\t\t".'full-width'."\r\n";
+					$body .= "\t\t\t\t".'min-width="290px"'."\r\n";
+					$body .= "\t\t\t>\r\n";
+			        $body .= "\t\t\t\t".'<v-text-field'."\r\n";
+					$body .= "\t\t\t\t\t".'slot="activator"'."\r\n";
+					$body .= "\t\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+					$body .= "\t\t\t\t\t".':label="$t(\'coreuser.'.$property.'\')"'."\r\n";
+					$body .= "\t\t\t\t\t".'prepend-icon="event"'."\r\n";
+					$body .= "\t\t\t\t\t".'readonly'."\r\n";
+                    $body .= "\t\t\t\t".'></v-text-field>'."\r\n";
+			        $body .= "\t\t\t\t".'<v-date-picker'."\r\n";
+				    $body .= "\t\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
+				    $body .= "\t\t\t\t\t".':locale="store.getters.locale"'."\r\n";
+				    $body .= "\t\t\t\t\t".'@input="$refs.'.$property.'.save(item.'.$property.')"'."\r\n";
+                    $body .= "\t\t\t\t".'></v-date-picker>'."\r\n";
+			        $body .= "\t\t\t".'</v-menu>'."\r\n";
                 }else if($dataType == 'string') {
                     $body .= "\t\t\t".'<v-text-field'."\r\n";
                     $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
@@ -522,6 +544,25 @@ class Factory
                 $body .= "\t\t\t\t".'multiple'."\r\n";
                 $body .= "\t\t\t\t".'autocomplete'."\r\n";
                 $body .= "\t\t\t".'></v-select>'."\r\n";
+            }
+        }
+
+        return $body;
+    }
+/**
+     * @param \Gesirdek\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueDatetimeModals(Model $model){
+        //dd($model->getCasts());
+        $body = "\r\n";
+        $vfilename = ($model->getBlueprint()->getModuleName() == 'app' ? '' : kebab_case($model->getBlueprint()->getModuleName())).str_replace('_','', str_singular($model->getTable()));
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                if($dataType == '\Carbon\Carbon') {
+                    $body.= "\t\t".$property.'_modal : false,'."\r\n";
+                }
             }
         }
 
