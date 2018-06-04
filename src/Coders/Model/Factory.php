@@ -318,9 +318,13 @@ class Factory
                     if(str_is('*able_id',$property)!==false){
                         $table_name=str_plural(substr($property,0,-7));
                         $route_module_part = $this->getModuleNameOfRelated($table_name);
+                        if(!$route_module_part)
+                            continue;
                         $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$route_module_part.str_replace('_','-',substr($property,0,-7)).'\'}, ';
                     }else{
                         $table_name=str_plural(substr($property,0,-3));
+                        if(!$route_module_part)
+                            continue;
                         $route_module_part = $this->getModuleNameOfRelated($table_name);
                         $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$route_module_part.str_replace('_','-',substr($property,0,-3)).'\'}, ';
                     }
@@ -331,6 +335,8 @@ class Factory
             if(Str::contains($constraint->body(),'belongsToMany')){
                 $table_name = str_plural($constraint->name());
                 $route_module_part = $this->getModuleNameOfRelated($table_name);
+                if(!$route_module_part)
+                    continue;
                 $body .= '{list:\''.$constraint->name().'\',source:\'/api/'.$route_module_part.str_replace('_','-',str_singular($constraint->name())).'\'}, ';
             }
         }
@@ -367,12 +373,15 @@ class Factory
             if($EC->getTable() == $table_name){
                 $parsed_ec = explode('\\',$entity_class);
                 if($parsed_ec[0] === 'Modules'){
+                    //echo "this is a module : ".$table_name."\n";
                     return str_slug($parsed_ec[1]).'/';
                 }else{
+                    //echo "this is not a module : ".$table_name."\n";
                     return '';
                 }
             }
         }
+        return false;
     }
     /**
      * @param \Gesirdek\Coders\Model\Model $model
