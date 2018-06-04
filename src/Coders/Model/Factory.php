@@ -323,9 +323,9 @@ class Factory
                         $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$route_module_part.str_replace('_','-',substr($property,0,-7)).'\'}, ';
                     }else{
                         $table_name=str_plural(substr($property,0,-3));
+                        $route_module_part = $this->getModuleNameOfRelated($table_name);
                         if(!$route_module_part)
                             continue;
-                        $route_module_part = $this->getModuleNameOfRelated($table_name);
                         $body .= '{list:\''.substr($property,0,-2).'list\',source:\'/api/'.$route_module_part.str_replace('_','-',substr($property,0,-3)).'\'}, ';
                     }
                 }
