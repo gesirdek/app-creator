@@ -223,7 +223,7 @@ WHERE c.relkind = \'r\'::char
             if($row['foreignkey'] != '-' && $row['foreignkey'] != null){
                 $foreignKeys[] = $row['name'];
                 $foreignKeyTables[] = $row['foreignkey'];
-                $foreignTableColumns =$row['foreignkey_fieldnum'];
+                $foreignTableColumns[] =$row['foreignkey_fieldnum'];
             }
         }
         if(count($primaryKeys) > 0){
