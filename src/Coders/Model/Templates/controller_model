@@ -14,7 +14,7 @@ class {{class}}Controller extends Controller
      * @return array
      */
     public function index(){
-        return {{class}}::all();
+        return {{class}}::paginate(10);
     }
 
     /**

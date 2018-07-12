@@ -4,5 +4,15 @@
   "token_expired_alert_title":"Your Session Expired",
   "token_expired_alert_text":"You need to login",
   "ok":"OK",
-  "cancel":"Cancel"
+  "cancel":"Cancel",
+  "filtering":{
+    "fields":"Select A Field",
+    "compare":"Compare as",
+    "value":"Value",
+    "operator":"Operator",
+    "button":"Filter",
+    "like":"like",
+    "and_operator":"and",
+    "or_operator":"or",
+  }
 }

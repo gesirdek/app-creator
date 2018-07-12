@@ -23,14 +23,21 @@
         </form>
       </v-card>
     </v-dialog>
+      <FilterResults @filterChanged="filterChanged" :filter="filter" ref="filtered" ></FilterResults>
+      <v-spacer></v-spacer>
     <v-data-table
             :headers="headers"
             :items="items"
-            hide-actions
+            :loading="loading"
+            :total-items="totalItems"
+            :pagination.sync="pagination"
+            :search="search"
             class="elevation-1"
     >
+
       <template slot="items" slot-scope="props">
         {{props}}
+
         <td class="justify-end layout px-0">
             <v-btn icon class="mx-0" @click="editItem(props.item)">
                 <v-icon color="teal">edit</v-icon>
@@ -53,39 +60,22 @@ import store from '~/store'
 export default {
   name: '{{vuefilename}}',
   mixins:[Crud],
+
   data () {
     return {
         {{lists}}
         {{datetime_modals}}
+
         store:store
     }
   },
-    mounted(){
-      loadComponentMessages({
-          "{{vuefilenamelower}}":{
-              "tr":{
-                "title":"",
-                {{modelfields}}
-                "are_you_sure":"Emin misiniz?",
-                "create_title":"Oluştur",
-                "update_title":"Güncelle",
-                "save":"Kaydet",
-                "update":"Güncelle",
-              },
-              "en":{
-                "title":"",
-                {{modelfields}}
-                "are_you_sure":"Are you sure?",
-                "create_title":"Create",
-                "update_title":"Update",
-                "save":"Save",
-                "update":"Update",
-              }
-          }
-      });
+  mounted(){
+      this.loadFilters({ {{resources}} });
+  },
+  created(){
       this.setResource('/{{modulename}}/{{lowerclass}}',{ {{resources}} },
       [{{resourcestwo}}],
       [{{listdata}}]);
-    }
+  }
 }
 </script>

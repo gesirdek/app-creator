@@ -4,5 +4,15 @@
   "token_expired_alert_title":"Oturumunuzun Süresi Doldu",
   "token_expired_alert_text":"Tekrar giriş yapınız",
   "ok":"Tamam",
-  "cancel":"İptal"
+  "cancel":"İptal",
+  "filtering":{
+    "fields":"Bir Alan Seçiniz",
+    "compare":"Karşılaştır",
+    "value":"Değer",
+    "operator":"Bağla",
+    "button":"Süz",
+    "like":"benzer",
+    "and_operator":"ve",
+    "or_operator":"veya",
+  }
 }

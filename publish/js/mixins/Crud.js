@@ -2,6 +2,8 @@ import axios from 'axios'
 import i18n from '~/plugins/i18n'
 import store from '~/store'
 import Confirm from '~/components/Confirm'
+import FilterResults from '~/components/FilterResults'
+
 /**
  * Crud Mixin
  * Usage: Add this mixin to provide crud actions
@@ -11,14 +13,25 @@ export default {
         return {
             items: [],
             item: {},
+            loading: true,
+            totalItems : 0,
+            pagination:{},
+            search: '',
             dialog: false,
             default_item: {},
             headers: [],
-            names: []
+            names: [],
+            filter:{},
         }
     },
-    components: { Confirm },
+    components: { Confirm, FilterResults },
     methods: {
+        filterChanged(e){
+            this.filter = Object.assign({}, e);
+        },
+        loadFilters(item_obj){
+            this.$refs.filtered.loadFilters(item_obj);
+        },
         setResource(resource,item_obj,names,multiples){
             this.names = names;
             names.forEach((value,key)=>{
@@ -38,15 +51,31 @@ export default {
             this.resource = resource;
             this.item = item_obj;
             this.default_item = JSON.parse(JSON.stringify(item_obj));
-            this.getItems();
         },
-        getItems(){
-            axios.get(this.resource,{
 
+        getItems(){
+            this.loading = true
+            return new Promise((resolve, reject) => {
+                axios.get(this.resource,{
+                    params: {
+                        page:this.pagination.page,
+                        per_page:this.pagination.rowsPerPage,
+                        filter:this.filter
+                    },
+                })
+                    .then(response => {
+                        const { descending, page, rowsPerPage } = this.pagination;
+
+                        let items = response.data.data;
+                        const total = response.data.total;
+
+                        this.loading = false;
+                        resolve({
+                            items,
+                            total
+                        });
+                    });
             })
-            .then(response => {
-                this.items = response.data
-            });
         },
         editItem(item){
             this.item=JSON.parse(JSON.stringify(item));
@@ -58,10 +87,10 @@ export default {
                 method: 'DELETE',
                 url: this.resource+'/'+item.id
             })
-            .then(response => {
-                this.items.splice(index, 1);
-                this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_deleted"),duration:3000});
-            })
+                .then(response => {
+                    this.items.splice(index, 1);
+                    this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_deleted"),duration:3000});
+                })
 
         },
         submit(){
@@ -79,12 +108,12 @@ export default {
                     url: this.resource+'/'+this.item.id,
                     data: this.item
                 })
-                .then(response => {
-                    this.getItems();
-                    this.resetItem();
-                    this.dialog=false;
-                    this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_updated"),duration:3000});
-                })
+                    .then(response => {
+                        this.getItems();
+                        this.resetItem();
+                        this.dialog=false;
+                        this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_updated"),duration:3000});
+                    })
             }
         },
         resetItem(){
@@ -112,6 +141,26 @@ export default {
                     this.headers = JSON.parse(JSON.stringify(new_header));
                 }
             });
-        }
+        },
+        pagination: {
+            handler () {
+                this.getItems()
+                    .then(data => {
+                        this.items = data.items;
+                        this.totalItems = data.total;
+                    })
+            },
+            deep: true
+        },
+        filter:{
+            handler () {
+                this.getItems()
+                    .then(data => {
+                        this.items = data.items;
+                        this.totalItems = data.total;
+                    })
+            },
+            deep: true
+        },
     }
 }

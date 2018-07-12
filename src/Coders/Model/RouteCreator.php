@@ -57,6 +57,7 @@ class RouteCreator{
             $this->createModuleVue($moduleName);
         }
     }
+
     protected function createModulePaths($modulename){
         if (!is_dir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js'))) {
             // dir doesn't exist, make it
@@ -65,6 +66,14 @@ class RouteCreator{
         if (!is_dir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js/components'))) {
             // dir doesn't exist, make it
             mkdir(base_path('Modules/'.studly_case($modulename).'/Resources/assets/js/components'));
+        }
+        if (!is_dir(base_path('Modules/'.studly_case($modulename).'/Resources/lang/tr'))) {
+            // dir doesn't exist, make it
+            mkdir(base_path('Modules/'.studly_case($modulename).'/Resources/lang/tr'));
+        }
+        if (!is_dir(base_path('Modules/'.studly_case($modulename).'/Resources/lang/en'))) {
+            // dir doesn't exist, make it
+            mkdir(base_path('Modules/'.studly_case($modulename).'/Resources/lang/en'));
         }
     }
     protected function createMainApiRoutes(){
@@ -82,21 +91,9 @@ class RouteCreator{
         self::putRouteJs(str_replace('/*{{imports}}*/', "import ".studly_case($modulename)." from '../../../../Modules/".studly_case($modulename)."/Resources/assets/js/components/".studly_case($modulename).".vue'\n/*{{imports}}*/", $contents));
     }
     protected function createModuleVue($modulename){
-        $contents = "<template>\n";
-        $contents .="\t<div>\n";
-        $contents .="\t\t<h1>".title_case($modulename)."</h1>\n";
-        $contents .="\t\t<router-view></router-view>\n";
-        $contents .="\t</div>\n";
-        $contents .="</template>\n";
-        $contents .="<script>\n";
-        $contents .="\t\texport default {\n";
-        $contents .="\t\t\tname: '".studly_case($modulename)."',\n";
-        $contents .="\t\t\tdata () {\n";
-        $contents .="\t\t\t\treturn {}\n";
-        $contents .="\t\t\t}\n";
-        $contents .="\t\t}\n";
-        $contents .="</script>";
-
+        $contents = File::get( __DIR__ . '/Templates/module_vue_model');
+        $contents = str_replace('{{title}}', kebab_case($modulename), $contents);
+        $contents = str_replace('{{name}}', studly_case($modulename),$contents);
         $file = base_path('Modules/'.studly_case($modulename).'/Resources/assets/js/components/'.studly_case($modulename).'.vue');
         File::put($file, $contents);
     }

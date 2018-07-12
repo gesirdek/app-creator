@@ -188,6 +188,24 @@ class Factory
         $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleTitle == 'App' ? '' : $moduleTitle),'.vue'), $file);
 
+        /*CREATE LANGUAGE PACKAGE*/
+        // todo create for each language from package config
+        $languageFileName = $this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'lang', 'tr'],'Component-','.php');
+        $template = $this->prepareTemplate($model, 'language_package');
+        $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
+        $this->files->put($languageFileName, $file);
+        if(!str_contains(php_uname(),'Windows')){
+            chmod($languageFileName,775);
+        }
+
+
+        $languageFileName = $this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'lang', 'en'],'Component-','.php');
+        $template = $this->prepareTemplate($model, 'language_package');
+        $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
+        $this->files->put($languageFileName, $file);
+        if(!str_contains(php_uname(),'Windows')){
+            chmod($languageFileName,775);
+        }
     }
 
     /**
@@ -269,7 +287,7 @@ class Factory
 
         $template = str_replace('{{vuefilename}}', ($modulename == 'App' ? '' : studly_case($modulename)) . $model->getClassName(), $template);
         $template = str_replace('{{vuefilenamelower}}', strtolower(($modulename == 'App' ? '' : $modulename)).str_replace('_', '', str_singular($model->getTable())), $template);
-        $template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
+        //$template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
         $template = str_replace('{{props}}', $this->getVueModelProps($model), $template);
@@ -287,6 +305,9 @@ class Factory
         $template = str_replace('{{properties}}', $this->properties($model), $template);
         $template = str_replace('{{class}}', $model->getClassName(), $template);
         $template = str_replace('{{body}}', $this->body($model), $template);
+
+        $template = str_replace('{{keys}}', $this->getLanguageKeys($model), $template);
+
 
         return $template;
     }
@@ -596,9 +617,12 @@ class Factory
 
             }
         }
+
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t".'<td><span v-for="r in '.$constraint->name().'" v-if="props.item.'.$constraint->name().'.includes(r.id)">{{ r.name }}</span></td>'."\r\n";
+                //$body .= "\t\t".'<td><span v-for="r in '.$constraint->name().'" v-if="props.item.'.$constraint->name().'.includes(r.id)">{{ r.name }}</span></td>'."\r\n";
+                $body .= "\t\t".'<td><v-chip :key="r.id" v-for="r in '.$constraint->name().'" v-if="props.item.'.$constraint->name().'.find(x => x.id === r.id)" class="">{{ r.name }}</v-chip>'."\r\n";
+
                 /*if(Str::contains($constraint->name(),'_id')){
                     $body .= "\t\t".'<td>{{ '.substr($constraint->name(),0,-2).'list.filter(function( a ) { return a.id === props.item.'.$constraint->name().'; })[0].name }}</td>'."\r\n";
                 }else{
@@ -658,15 +682,16 @@ class Factory
      *
      * @return mixed
      */
-    protected function getVueModelFields(Model $model){
+    protected function getLanguageKeys(Model $model){
         $body = "";
+        $body .="\t".'"title"=>\''.title_case(str_replace('-',' ',$model->getTable())).'\','."\r\n";
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
-                $body .="\t\t\t\t".'"'.$property.'":\''.title_case(str_replace('_',' ',str_replace('_id','',$property))).'\','."\r\n";
+                $body .="\t".'"'.$property.'"=>\''.title_case(str_replace('_',' ',str_replace('_id','',$property))).'\','."\r\n";
             }
         }
 
-        return substr(substr($body,4),0,-2);
+        return $body;
     }
 
     /**
