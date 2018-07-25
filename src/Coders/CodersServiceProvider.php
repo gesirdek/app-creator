@@ -37,6 +37,7 @@ class CodersServiceProvider extends ServiceProvider
                 CodeModelsCommand::class,
             ]);
         }
+        $this->loadRoutesFrom(__DIR__.'/../Http/routes.php');
     }
 
     /**
