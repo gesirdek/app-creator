@@ -14,7 +14,17 @@ class {{class}}Controller extends Controller
      * @return array
      */
     public function index(){
-        return {{class}}::paginate(10);
+        $model = new {{class}};
+        $filters = json_decode($request->get('filter'));
+        foreach ($filters as $filter){
+            if($filter->operator == 've' || $filter->operator == ''){
+                $model = $model->where($filter->field,$filter->comparison,$filter->value);
+            }else{
+                $model = $model->orWhere($filter->field,$filter->comparison,$filter->value);
+            }
+        }
+
+        return $model->paginate($request->get('per_page'));
     }
 
     /**
