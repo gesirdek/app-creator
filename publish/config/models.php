@@ -393,7 +393,7 @@ return [
         /*
          * Do you want user management
          */
-        'user_management' => true,
+        'user_management' => false,
 
         /*
          * Define User Identifier Column in users table

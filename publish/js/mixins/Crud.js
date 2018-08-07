@@ -44,7 +44,7 @@ export default {
                 multiples.forEach((value)=>{
                     axios.get(value.source)
                         .then(response => {
-                            this[value.list] = response.data
+                            this[value.list] = response.data.data
                         });
                 });
             }

@@ -2,7 +2,6 @@ import Cookies from 'js-cookie'
 import {Validator} from 'vee-validate'
 import tr from 'vee-validate/dist/locale/tr'
 import en from 'vee-validate/dist/locale/en'
-import {loadMessages} from "../plugins/i18n";
 //const { locale, locales } = window.config;
 
 // state
@@ -41,7 +40,7 @@ export const actions = {
         await axios.post('/gesirdek/set-language/' + locale);
         Cookies.set('locale', locale, {expires: 365});
         Validator.localize(locale, {locale});
-        loadMessages(locale);
+        //loadMessages(locale);
         commit("set_locale",{locale})
     }
 };

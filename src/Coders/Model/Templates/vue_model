@@ -9,16 +9,16 @@
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>
-          <span class="headline" v-if="!item.id">{{ $t('{{vuefilenamelower}}.create_title') }}</span>
-          <span class="headline" v-if="item.id">{{ $t('{{vuefilenamelower}}.update_title') }}</span>
+          <span class="headline" v-if="!item.id">{{ $t('form.create_title') }}</span>
+          <span class="headline" v-if="item.id">{{ $t('form.update_title') }}</span>
         </v-card-title>
         <form @submit.prevent="submit()">
           <v-card-text>{{vuefields}}
           </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn type="primary" color="primary" v-if="!item.id">{{ $t('{{vuefilenamelower}}.save') }}</v-btn>
-              <v-btn type="primary" color="primary" v-if="item.id">{{ $t('{{vuefilenamelower}}.update') }}</v-btn>
+              <v-btn type="primary" color="primary" v-if="!item.id">{{ $t('form.save') }}</v-btn>
+              <v-btn type="primary" color="primary" v-if="item.id">{{ $t('form.update') }}</v-btn>
             </v-card-actions>
         </form>
       </v-card>
@@ -48,7 +48,7 @@
         </td>
       </template>
     </v-data-table>
-    <Confirm @confirm="deleteItem" ref="confirm" message="{{vuefilenamelower}}.are_you_sure"></Confirm>
+    <Confirm @confirm="deleteItem" ref="confirm" message="form.are_you_sure"></Confirm>
   </div>
 </template>
 

@@ -190,7 +190,9 @@ class Factory
 
         /*CREATE LANGUAGE PACKAGE*/
         // todo create for each language from package config
-        $languageFileName = $this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'lang', 'tr'],'Component-','.php');
+        //$languageFileName = $this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'lang', 'tr'],'Component-','.php');
+        $languageFileName = $this->modelPathSmallCase($model, $model->usesBaseFiles() ? ['Base'] : ['resources','lang','tr'],'Component-'.strtolower($moduleTitle == 'App' ? '' : $moduleTitle),'.php');
+        $languageFileName = $this->modelPathSmallCase($model, $model->usesBaseFiles() ? ['Base'] : ['resources','lang','en'],'Component-'.strtolower($moduleTitle == 'App' ? '' : $moduleTitle),'.php');
         $template = $this->prepareTemplate($model, 'language_package');
         $file = $this->fillTemplate($template, $model, $namespaces, $moduleTitle);
         $this->files->put($languageFileName, $file);
@@ -368,6 +370,8 @@ class Factory
     protected function getModelsInFolder($paths){
         $out = [];
         foreach ($paths as $path){
+            if(!is_dir($path))
+                continue;
             $results = scandir($path);
             foreach ($results as $result) {
                 if ($result === '.' or $result === '..') continue;
@@ -943,6 +947,24 @@ class Factory
         }
 
         return $this->path([$modelsDirectory, $preFix.$model->getClassName().$sufFix]);
+    }
+
+    /**
+     * @param \Gesirdek\Coders\Model\Model $model
+     *
+     * @param array $custom
+     *
+     * @return string
+     */
+    protected function modelPathSmallCase(Model $model, $custom = [], $preFix = "", $sufFix = "")
+    {
+        $modelsDirectory = $this->path(array_merge([$this->config($model->getBlueprint(), 'path')], $custom));
+
+        if (! $this->files->isDirectory($modelsDirectory)) {
+            $this->files->makeDirectory($modelsDirectory, 0755, true);
+        }
+
+        return $this->path([$modelsDirectory, $preFix.strtolower($model->getClassName()).$sufFix]);
     }
 
     /**
