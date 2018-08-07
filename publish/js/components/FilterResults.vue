@@ -38,6 +38,8 @@
                         <v-select
                                 v-model="statement.operator"
                                 :items="statement_operators"
+                                item-text="name"
+                                item-value="value"
                                 label="$t('filtering.operator')"
                         ></v-select>
                     </v-flex>
@@ -59,6 +61,7 @@
 
 
 <script>
+    import i18n from '~/plugins/i18n'
     export default {
         name:'FilterResults',
         props: {
@@ -67,10 +70,10 @@
         data() {
             return {
                 statements:[],
-                statement_comparisons:[$t('filtering.like'), '=', '>', '<','>=','<='],
+                statement_comparisons:[i18n.t('filtering.like'), '=', '>', '<','>=','<='],
                 statement_fields:[],
-                statement_operators:[$t('filtering.and_operator'),$t('filtering.or_operator')],
-                statement:{field:'',comparison:'',value:'',operator:$t('filtering.and_operator'),btn:{}},
+                statement_operators:[{name:i18n.t('filtering.and_operator'),value:'and'},{name:i18n.t('filtering.or_operator'),value:'or'}],
+                statement:{field:'',comparison:'',value:'',operator:i18n.t('filtering.and_operator'),btn:{}},
             }
         },
 
