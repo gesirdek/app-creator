@@ -44,7 +44,7 @@ export default {
                 multiples.forEach((value)=>{
                     axios.get(value.source)
                         .then(response => {
-                            this[value.list] = response.data.data
+                            this[value.list] = response.data;
                         });
                 });
             }
@@ -97,7 +97,11 @@ export default {
             if(typeof this.item.id === 'undefined' || this.item.id===0){
                 axios.post(this.resource,this.item)
                     .then(response => {
-                        this.getItems();
+                        this.getItems()
+                            .then(data => {
+                                this.items = data.items;
+                                this.totalItems = data.total;
+                            })
                         this.resetItem();
                         this.dialog=false;
                         this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_saved"),duration:3000});
@@ -109,7 +113,11 @@ export default {
                     data: this.item
                 })
                     .then(response => {
-                        this.getItems();
+                        this.getItems()
+                            .then(data => {
+                                this.items = data.items;
+                                this.totalItems = data.total;
+                            })
                         this.resetItem();
                         this.dialog=false;
                         this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_updated"),duration:3000});
