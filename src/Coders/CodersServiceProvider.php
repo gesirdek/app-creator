@@ -2,6 +2,7 @@
 
 namespace Gesirdek\Coders;
 
+use Gesirdek\Providers\RouteServiceProvider;
 use Gesirdek\Support\Classify;
 use Gesirdek\Coders\Model\Config;
 use Illuminate\Filesystem\Filesystem;
@@ -12,17 +13,13 @@ use Gesirdek\Coders\Model\Factory as ModelFactory;
 class CodersServiceProvider extends ServiceProvider
 {
     /**
-     * @var bool
-     */
-    protected $defer = true;
-
-    /**
      * Bootstrap the application services.
      *
      * @return void
      */
     public function boot()
     {
+        $this->loadRoutesFrom(__DIR__.'/../Http/routes.php');
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../../publish/config/models.php' => config_path('models.php'),

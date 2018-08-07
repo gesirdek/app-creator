@@ -14,8 +14,12 @@ const components_messages = [];
  * @param {String} locale
  */
 export async function loadMessages (locale) {
-    const messages = await import(`~/lang/${locale}`);
-    i18n.setLocaleMessage(locale, messages);
+    if (i18n.locale !== locale) {
+        i18n.locale = locale
+    }
+    await axios.get('/gesirdek/get-component-translations/' + locale).then(response => {
+        i18n.mergeLocaleMessage(locale, response.data);
+    });
     if(components_messages.length > 0){
         let a = 0;
         components_messages.forEach((component_messages) => {
@@ -27,9 +31,6 @@ export async function loadMessages (locale) {
             }
         });
     }
-    if (i18n.locale !== locale) {
-        i18n.locale = locale
-    }
 }
 /**
  * @param {object} messages
@@ -39,11 +40,9 @@ export function loadComponentMessages (messages) {
     let component_name = Object.keys(messages)[0];
     components_messages.push(messages);
     i18n.mergeLocaleMessage(i18n.locale, {[component_name]:messages[component_name][i18n.locale]});
-    console.log("messages after component load ",i18n.messages);
 }
 
 (async function () {
-  console.log("application loaded", store.getters.locale);
   await loadMessages(store.getters.locale)
 })();
 
