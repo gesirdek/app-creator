@@ -2,6 +2,7 @@
 
 namespace {{namespacecontroller}};
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use {{namespacemodel}}\{{class}};
@@ -13,7 +14,7 @@ class {{class}}Controller extends Controller
      * List model
      * @return array
      */
-    public function index(){
+    public function index(Request $request){
         $model = new {{class}};
         $filters = json_decode($request->get('filter'));
         foreach ($filters as $filter){
