@@ -54,7 +54,10 @@ export default {
         },
 
         getItems(){
-            this.loading = true
+            this.loading = true;
+            let localthis = this;
+
+
             return new Promise((resolve, reject) => {
                 axios.get(this.resource,{
                     params: {
@@ -65,6 +68,7 @@ export default {
                 })
                     .then(response => {
                         const { descending, page, rowsPerPage } = this.pagination;
+                        localthis.pagination.totalItems = response.data.total;
 
                         let items = response.data.data;
                         const total = response.data.total;
