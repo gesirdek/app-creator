@@ -23,7 +23,14 @@
         </form>
       </v-card>
     </v-dialog>
-      <FilterResults @filterChanged="filterChanged" :filter="filter" ref="filtered" ></FilterResults>
+      <v-text-field
+                    flat
+                    prepend-icon="search"
+                    :label="$t('app.search')"
+                    class="hidden-sm-and-down"
+                    v-model="searchText"
+                    :clearable="true"
+            ></v-text-field>
       <v-spacer></v-spacer>
     <v-data-table
             :headers="headers"
