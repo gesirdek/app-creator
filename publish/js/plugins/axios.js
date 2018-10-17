@@ -5,34 +5,6 @@ import i18n from '~/plugins/i18n'
 
 // Request interceptor
 axios.interceptors.request.use(async request => {
-    let url = request.url;
-    const token = store.getters.token;
-    if (token) {
-        request.headers.common['Authorization'] = token
-    } else {
-        if (url.substr(0, 10) !== "/api/guest") {
-            let request_identifier = url + JSON.stringify(request.data);
-            if (store.getters.waiting_requests.includes(request_identifier) === true) {
-                return false;
-            }
-            store.commit("update_dialog", true);
-            store.commit("add_to_waiting_requests", request_identifier);
-            await new Promise((resolve) => {
-                console.log(url + " waiting");
-                let refreshIntervalId = setInterval(function () {
-                    if (store.getters.user) {
-                        clearInterval(refreshIntervalId);
-                        request.headers.common['Authorization'] = store.getters.token;
-                        console.log(url + " sent");
-                        resolve(request);
-                    }
-                }, 1000);
-            })
-        }
-    }
-
-    // request.headers['X-Socket-Id'] = Echo.socketId()
-    //store.commit("loading",true);
     return request
 });
 

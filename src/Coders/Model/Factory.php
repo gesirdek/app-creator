@@ -334,7 +334,6 @@ class Factory
      */
     protected function getVueListData(Model $model){
         $body = "";
-
         foreach ($model->getProperties() as $property => $dataType){
             if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
                 if(str_is('*_id',$property)){
@@ -493,7 +492,6 @@ class Factory
                 }else if($dataType == 'boolean'){
                     $body .= "\t\t\t".'<v-checkbox'."\r\n";
                     $body .= "\t\t\t\t".'v-model="item.'.$property.'"'."\r\n";
-                    $body .= "\t\t\t\t".'value="1"'."\r\n";
                     $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$property.'\')"'."\r\n";
                     $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$property.'\')"'."\r\n";
                     $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";

@@ -11,6 +11,7 @@ import FilterResults from '~/components/FilterResults'
 export default {
     data: function () {
         return {
+            searchText: "",
             items: [],
             item: {},
             loading: true,
@@ -44,7 +45,7 @@ export default {
                 multiples.forEach((value)=>{
                     axios.get(value.source)
                         .then(response => {
-                            this[value.list] = response.data.data
+                            this[value.list] = response.data;
                         });
                 });
             }
@@ -54,7 +55,10 @@ export default {
         },
 
         getItems(){
-            this.loading = true
+            this.loading = true;
+            let localthis = this;
+
+
             return new Promise((resolve, reject) => {
                 axios.get(this.resource,{
                     params: {
@@ -65,6 +69,7 @@ export default {
                 })
                     .then(response => {
                         const { descending, page, rowsPerPage } = this.pagination;
+                        localthis.pagination.totalItems = response.data.total;
 
                         let items = response.data.data;
                         const total = response.data.total;
@@ -97,7 +102,11 @@ export default {
             if(typeof this.item.id === 'undefined' || this.item.id===0){
                 axios.post(this.resource,this.item)
                     .then(response => {
-                        this.getItems();
+                        this.getItems()
+                            .then(data => {
+                                this.items = data.items;
+                                this.totalItems = data.total;
+                            })
                         this.resetItem();
                         this.dialog=false;
                         this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_saved"),duration:3000});
@@ -109,7 +118,11 @@ export default {
                     data: this.item
                 })
                     .then(response => {
-                        this.getItems();
+                        this.getItems()
+                            .then(data => {
+                                this.items = data.items;
+                                this.totalItems = data.total;
+                            })
                         this.resetItem();
                         this.dialog=false;
                         this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_updated"),duration:3000});
@@ -162,5 +175,13 @@ export default {
             },
             deep: true
         },
+        searchText:
+            _.debounce(function () {
+                this.getItems()
+                    .then(data => {
+                        this.items = data.items;
+                        this.totalItems = data.total;
+                    })
+            }, 1000)
     }
 }
