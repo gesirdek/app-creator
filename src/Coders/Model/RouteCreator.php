@@ -142,7 +142,7 @@ class RouteCreator{
                 },\n/*{{module_content_".$blueprint->getModuleName()."}}*/", $contents);
                 self::putRouteJs($contents);
 
-                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.$blueprint->getModuleName()."-".str_replace('_','-',str_singular($blueprint->table())).'":"'.str_replace('_',' ', title_case($blueprint->table())).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
+                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.$blueprint->getModuleName()."-".str_replace('_','-',str_singular($blueprint->table())).'":"'.str_replace('_',' ', title_case(substr($blueprint->table(), 3))).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
             }else{ //Modül dışındakiler için burası
 
                 $contents = str_replace('/*{{routebody}}*/', "Route::apiResource('".str_replace('_','-',str_singular($blueprint->table()))."', '".studly_case(str_singular($blueprint->table()))."Controller');\n/*{{routebody}}*/", self::getRouteApi());
@@ -151,7 +151,7 @@ class RouteCreator{
                 $contents = str_replace('/*{{modulus}}*/',"\t".'{ path: \'/'.studly_case(str_singular($blueprint->table())).'\', name: \''.studly_case(str_singular($blueprint->table())).'\', component: '.studly_case(str_singular($blueprint->table())).' },'."\n/*{{modulus}}*/", $contents);
                 self::putRouteJs($contents);
 
-                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.studly_case(str_singular($blueprint->table())).'":"'.title_case(str_replace('_',' ',str_singular($blueprint->table()))).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
+                self::putMenuFile(str_replace('/*{{menucontent}}*/','"'.studly_case(str_singular($blueprint->table())).'":"'.title_case(str_replace('_',' ',str_singular(substr($blueprint->table(), 3)))).'",'."\n\t\t\t\t\t\t/*{{menucontent}}*/", self::getMenuFile()));
             }
         }
     }

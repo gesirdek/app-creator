@@ -291,6 +291,7 @@ class Factory
         $template = str_replace('{{vuefilenamelower}}', strtolower(($modulename == 'App' ? '' : $modulename)).str_replace('_', '', str_singular($model->getTable())), $template);
         //$template = str_replace('{{modelfields}}', $this->getVueModelFields($model), $template);
         $template = str_replace('{{resources}}', $this->getVueModelResources($model), $template);
+        $template = str_replace('{{searchfilter}}', $this->getVueFilterValue($model), $template);
         $template = str_replace('{{resourcestwo}}', $this->getVueModelResourcesTwo($model), $template);
         $template = str_replace('{{props}}', $this->getVueModelProps($model), $template);
         $template = str_replace('{{vuefields}}', $this->getVueFields($model), $template);
@@ -715,6 +716,28 @@ class Factory
 
         return $body;
     }
+
+    /**
+     * @param \Gesirdek\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueFilterValue(Model $model){
+        $body = '';
+        foreach ($model->getProperties() as $property => $dataType){
+            if($property != 'id' && $property != 'created_at' && $property != 'updated_at' && $property != 'deleted_at'){
+                $body .= $property.':\''.$property.'\',';
+            }
+        }
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body .= $constraint->name().': [],';
+            }
+        }
+
+        return $body;
+    }
+
 
     /**
      * @param \Gesirdek\Coders\Model\Model $model

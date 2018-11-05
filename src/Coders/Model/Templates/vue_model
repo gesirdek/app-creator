@@ -77,7 +77,7 @@ export default {
     }
   },
   mounted(){
-      this.filter = {{{resources}}};
+      this.filter = {{{searchfilter}}};
   },
   created(){
       this.setResource('/{{modulename}}/{{lowerclass}}',{ {{resources}} },
