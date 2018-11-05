@@ -27,10 +27,10 @@ class RouteCreator{
         return File::get(base_path('routes/api.php'));
     }
     private static function getModuleRoute($studlymodulename){
-        return File::get(base_path('Modules/'.$studlymodulename.'/Http/routes.php'));
+        return File::get(base_path('Modules/'.$studlymodulename.'/Routes/web.php'));
     }
     private static function putModuleRoute($studlymodulename, $contents){
-        return File::put(base_path('Modules/'.$studlymodulename.'/Http/routes.php'), $contents);
+        return File::put(base_path('Modules/'.$studlymodulename.'/Routes/web.php'), $contents);
     }
     private static function putRouteApi($contents){
         File::put(base_path('routes/api.php'), $contents);
@@ -100,7 +100,7 @@ class RouteCreator{
     protected function createModuleContents($modulename)
     {
         $body = "<?php\n";
-        $body .= "Route::group(['prefix' => 'api/".$modulename."', 'namespace' => 'Modules\\".studly_case($modulename)."\Http\Controllers'], function()\n";
+        $body .= "Route::group(['prefix' => 'api/".$modulename."'], function()\n";
         $body .= "{\n";
         $body .= "/*{{routebody}}*/\n";
         $body .= "});";

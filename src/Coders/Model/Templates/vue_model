@@ -38,7 +38,6 @@
             :loading="loading"
             :total-items="totalItems"
             :pagination.sync="pagination"
-            :search="search"
             class="elevation-1"
     >
 
@@ -71,13 +70,14 @@ export default {
   data () {
     return {
         {{lists}}
+        {{variables}}
         {{datetime_modals}}
 
         store:store
     }
   },
   mounted(){
-      this.loadFilters({ {{resources}} });
+      this.filter = {{{resources}}};
   },
   created(){
       this.setResource('/{{modulename}}/{{lowerclass}}',{ {{resources}} },

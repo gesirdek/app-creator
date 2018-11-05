@@ -23,10 +23,91 @@ export default {
             headers: [],
             names: [],
             filter:{},
+            search_meta:[],
+            delayKeyUp:(function(){
+                var timer = 0;
+                return function(callback, ms){
+                    clearTimeout (timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })(),
         }
     },
     components: { Confirm, FilterResults },
+    created(){
+        this.getSearchMetaList();
+    },
     methods: {
+        createChip(apiList, subList, title, modelList, element, auto_complete_ref, displayList){
+            let found = undefined;
+
+            found = modelList.filter(obj => {
+                return obj.id === element;
+            })[0];
+
+            if(found === undefined){
+                let foundObj = apiList[subList].filter(obj => {
+                    return obj.id === element;
+                })[0];
+                if(foundObj !== undefined){
+                    modelList.push(foundObj.id);
+                    let objToModel = {id:foundObj.id,};
+                    objToModel[title] = foundObj[title];
+                    displayList.push(objToModel);
+
+                }
+                apiList[subList] = [];
+            }
+
+            this.$refs[auto_complete_ref].clearableCallback(); //clear value
+        },
+        removeChip(item, modelList, displayList) {
+            modelList.splice(modelList.indexOf(item), 1);
+            displayList.splice(displayList.indexOf(item), 1);
+        },
+        getSearchMetaList(){
+            let local = this;
+            axios.get('/api/search-key')
+                .then(res => {
+                    local.search_meta = res.data;
+                })
+                .catch(err => {
+                    console.log(err)
+                })//.finally(() => ( ));
+
+        },
+        getGroupTitle(groupable_type, ){
+            if(groupable_type !== undefined && groupable_type !== ''){
+                let foreign_key = groupable_type.split("\\")[3].split(/(?=[A-Z])/).join('_').toLowerCase() + "_id";
+                return this.search_meta.find(x => x.foreign_key === foreign_key).search_in;
+            }
+            return "";
+        },
+        loadThis(api, list, item, event){
+            let value = '';
+            if(event.target === undefined){
+                value = event;
+            }else{
+                value = event.target.value;
+            }
+
+            this.delayKeyUp(
+                function () {
+                    if(value.length > 1){
+                        axios.get(api,{
+                            params: {
+                                keyword: value
+                            },
+                        })
+                            .then(res => {
+                                list[item] = res.data;
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
+                    }
+                },10);
+        },
         filterChanged(e){
             this.filter = Object.assign({}, e);
         },
@@ -64,11 +145,14 @@ export default {
                     params: {
                         page:this.pagination.page,
                         per_page:this.pagination.rowsPerPage,
-                        filter:this.filter
+                        keyword: this.searchText,
+                        filter:this.filter,
+                        sort_by:this.pagination.sortBy,
+                        sort_dir:this.pagination.descending,
                     },
                 })
                     .then(response => {
-                        const { descending, page, rowsPerPage } = this.pagination;
+                        const { sortBy, descending, page, rowsPerPage } = this.pagination;
                         localthis.pagination.totalItems = response.data.total;
 
                         let items = response.data.data;
@@ -166,6 +250,26 @@ export default {
             deep: true
         },
         filter:{
+            handler () {
+                this.getItems()
+                    .then(data => {
+                        this.items = data.items;
+                        this.totalItems = data.total;
+                    })
+            },
+            deep: true
+        },
+        currentSort:{
+            handler () {
+                this.getItems()
+                    .then(data => {
+                        this.items = data.items;
+                        this.totalItems = data.total;
+                    })
+            },
+            deep: true
+        },
+        currentSortDir:{
             handler () {
                 this.getItems()
                     .then(data => {

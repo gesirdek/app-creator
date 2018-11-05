@@ -295,6 +295,7 @@ class Factory
         $template = str_replace('{{props}}', $this->getVueModelProps($model), $template);
         $template = str_replace('{{vuefields}}', $this->getVueFields($model), $template);
         $template = str_replace('{{lists}}', $this->getVueLists($model), $template);
+        $template = str_replace('{{variables}}', $this->getVueVariables($model), $template);
         $template = str_replace('{{datetime_modals}}', $this->getVueDatetimeModals($model), $template);
         $template = str_replace('{{listdata}}', $this->getVueListData($model), $template);
         $template = str_replace('{{lowerclass}}', str_replace('_', '-', str_singular($model->getTable())), $template);
@@ -457,14 +458,36 @@ class Factory
                 }
             }
         }
+        $body .= "\t\t"."auto_complete_list:{";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body.= "\t\t".$constraint->name().' : [],'."\r\n";
+                $body.= $constraint->name().' : [],';
+            }
+        }
+        $body .= "},"."\r\n";
+
+        return substr(substr($body,2),0,-2);
+    }
+
+    /**
+     * @param \Gesirdek\Coders\Model\Model $model
+     *
+     * @return mixed
+     */
+    protected function getVueVariables(Model $model){
+        $body = "";
+
+        foreach ($model->getRelations() as $constraint) {
+            if(Str::contains($constraint->body(),'belongsToMany')){
+                $body.= "\t\t".$constraint->name().'_multiselect_ref : \'\','."\r\n";
+                $body.= "\t\t".$constraint->name().'_multiselect: \'\','."\r\n";
+                $body.= "\t\t".$constraint->name().'_display_list : [],'."\r\n";
             }
         }
 
         return substr(substr($body,2),0,-2);
     }
+
 
     /**
      * @param \Gesirdek\Coders\Model\Model $model
@@ -563,19 +586,33 @@ class Factory
         }
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body .= "\t\t\t".'<v-select'."\r\n";
-                $body .= "\t\t\t\t".':items="'.$constraint->name().'"'."\r\n";
-                $body .= "\t\t\t\t".'item-text="name"'."\r\n";
-                $body .= "\t\t\t\t".'item-value="id"'."\r\n";
-                $body .= "\t\t\t\t".'v-model="item.'.$constraint->name().'"'."\r\n";
-                $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$constraint->name().'\')"'."\r\n";
-                $body .= "\t\t\t\t".':error-messages="errors.collect(\''.$constraint->name().'\')"'."\r\n";
-                $body .= "\t\t\t\t".'v-validate="\'required\'"'."\r\n";
-                $body .= "\t\t\t\t".':data-vv-name="$t(\''.$vfilename.'.'.$constraint->name().'\')"'."\r\n";
-                $body .= "\t\t\t\t".'required'."\r\n";
-                $body .= "\t\t\t\t".'multiple'."\r\n";
-                $body .= "\t\t\t\t".'autocomplete'."\r\n";
-                $body .= "\t\t\t".'></v-select>'."\r\n";
+                $constraintModule = strtolower(explode("\\",explode("|",$constraint->hint())[1])[2]);
+                $body .= "\t\t\t"."<v-autocomplete"."\r\n";
+                $body .= "\t\t\t\t"."v-model=\"".$constraint->name()."_multiselect\""."\r\n";
+                $body .= "\t\t\t\t".":ref=\"".$constraint->name()."_multiselect_ref\""."\r\n";
+                $body .= "\t\t\t\t"."@keyup=\"loadThis('/api/".$constraintModule."/".str_replace('_','-',str_singular($constraint->name()))."',auto_complete_list, '".$constraint->name()."', \$event)\""."\r\n";
+                $body .= "\t\t\t\t"."@change=\"createChip(auto_complete_list ,'".$constraint->name()."', 'name', item.".$constraint->name().", \$event, ".$constraint->name()."_multiselect_ref, auto_complete_list.".$constraint->name()."_display_list)\""."\r\n";
+                $body .= "\t\t\t\t".":items=\"auto_complete_list.".$constraint->name()."\""."\r\n";
+                $body .= "\t\t\t\t".":error-messages=\"errors.collect(\$t('".$vfilename.".".$constraint->name()."'))\""."\r\n";
+                $body .= "\t\t\t\t"."color=\"white\""."\r\n";
+                $body .= "\t\t\t\t"."item-text=\"name\""."\r\n";
+                $body .= "\t\t\t\t"."item-value=\"id\""."\r\n";
+                $body .= "\t\t\t\t"."clearable"."\r\n";
+                $body .= "\t\t\t\t".":label=\"\$t('".$vfilename.".".$constraint->name()."')\""."\r\n";
+                $body .= "\t\t\t\t"."placeholder=\"\$t('".$vfilename.".".$constraint->name()."')\">"."\r\n";
+                $body .= "\t\t\t\t"."</v-autocomplete>"."\r\n";
+                $body .= "\t\t\t\t"."<v-select"."\r\n";
+                $body .= "\t\t\t\t"."v-model=\"item.".$constraint->name()."\""."\r\n";
+                $body .= "\t\t\t\t".":items=\"auto_complete_list.".$constraint->name()."_display_list\""."\r\n";
+                $body .= "\t\t\t\t"."v-validate=\"'required'\""."\r\n";
+                $body .= "\t\t\t\t"."attach"."\r\n";
+                $body .= "\t\t\t\t"."chips"."\r\n";
+                $body .= "\t\t\t\t"."label=\"Chips\""."\r\n";
+                $body .= "\t\t\t\t"."multiple"."\r\n";
+                $body .= "\t\t\t\t"."></v-select>"."\r\n";
+                $body .= "\t\t\t\t"."<span>"."\r\n";
+                $body .= "\t\t\t\t"."<v-chip :key=\"r.id\" v-for=\"r in auto_complete_list.".$constraint->name()."_display_list\" close @input=\"removeChip(r, item.".$constraint->name().", auto_complete_list.".$constraint->name()."_display_list)\">{{ r.name }}</v-chip>"."\r\n";
+                $body .= "\t\t\t\t"."</span>"."\r\n";
             }
         }
 
