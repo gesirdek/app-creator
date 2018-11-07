@@ -964,10 +964,10 @@ class Factory
 
         $withs=[];
 
-        foreach ($model->getRelations() as $constraint) {
+        /*foreach ($model->getRelations() as $constraint) { //no with
             if(str_plural($constraint->name()) == $constraint->name())
                 $withs[]=$constraint->name();
-        }
+        }*/
         $body .= $this->class->field('with', $withs, ['before' => "\n"]);
 
         foreach ($model->getMutations() as $mutation) {
