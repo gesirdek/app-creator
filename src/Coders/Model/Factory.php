@@ -978,6 +978,20 @@ class Factory
             $body .= $this->class->method($constraint->name(), $constraint->body(), ['before' => "\n"]);
         }
 
+        //dd($model->getFillable());
+        foreach ($model->getFillable() as $field) {
+            if($field == 'parent_id'){
+                $body .= $this->class->method("parent", "return \$this->belongsTo(".$model->getClassName()."::class, 'parent_id'); ", ['before' => "\n"]);
+                $body .= $this->class->method("children", "return \$this->hasMany(".$model->getClassName()."::class, 'parent_id'); ", ['before' => "\n"]);
+            }
+        }
+
+
+        /*if ($model->hasFillable() && $model->doesNotUseBaseFiles()) {
+            if()
+            $body .= $this->class->field('fillable', $model->getFillable(), ['before' => "\n"]);
+        }*/
+
         // Make sure there not undesired line breaks
         $body = trim($body, "\n");
 
