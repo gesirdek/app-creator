@@ -5,7 +5,8 @@ to create Laravel 5.6 and Vue2 application from database.
 
 ## How does it work?
 
-This package expects that you are using Laravel 5.6.
+This package expects that you are using Laravel 5.6+ and already have a fresh Laravel installation with a database that has Laravel naming convention for databases.
+Then
 You will need to import the `app-creator` package via composer:
 
 ```shell
