@@ -111,7 +111,7 @@ export default {
                     }else{
                         this.$watch(value.list+'_search',
                             _.debounce(function () {
-                                if(this[value.list+'_search']!=null && this[value.list+'_search'].length > 2){
+                                if(this[value.list+'_search']!=null && this[value.list+'_search'].length > 0){
                                     axios.get(value.source,{
                                         params: {
                                             page:1,

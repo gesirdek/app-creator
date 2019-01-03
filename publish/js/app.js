@@ -9,9 +9,6 @@ import tr from 'vee-validate/dist/locale/tr'
 import VeeValidate, { Validator } from 'vee-validate'
 import i18n from './plugins/i18n'
 import Vuetify from 'vuetify'
-import BootstrapVue from 'bootstrap-vue'
-
-Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false;
 Validator.localize('tr', tr);
