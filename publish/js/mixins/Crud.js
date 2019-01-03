@@ -2,7 +2,6 @@ import axios from 'axios'
 import i18n from '~/plugins/i18n'
 import store from '~/store'
 import Confirm from '~/components/Confirm'
-import FilterResults from '~/components/FilterResults'
 
 /**
  * Crud Mixin
@@ -24,6 +23,8 @@ export default {
             names: [],
             filter:{},
             search_meta:[],
+            multiples:[],
+            parent_id:-1,
             delayKeyUp:(function(){
                 var timer = 0;
                 return function(callback, ms){
@@ -33,38 +34,11 @@ export default {
             })(),
         }
     },
-    components: { Confirm, FilterResults },
+    components: { Confirm },
     created(){
         this.getSearchMetaList();
     },
     methods: {
-        createChip(apiList, subList, title, modelList, element, auto_complete_ref, displayList){
-            let found = undefined;
-
-            found = modelList.filter(obj => {
-                return obj.id === element;
-            })[0];
-
-            if(found === undefined){
-                let foundObj = apiList[subList].filter(obj => {
-                    return obj.id === element;
-                })[0];
-                if(foundObj !== undefined){
-                    modelList.push(foundObj.id);
-                    let objToModel = {id:foundObj.id,};
-                    objToModel[title] = foundObj[title];
-                    displayList.push(objToModel);
-
-                }
-                apiList[subList] = [];
-            }
-
-            this.$refs[auto_complete_ref].clearableCallback(); //clear value
-        },
-        removeChip(item, modelList, displayList) {
-            modelList.splice(modelList.indexOf(item), 1);
-            displayList.splice(displayList.indexOf(item), 1);
-        },
         getSearchMetaList(){
             let local = this;
             axios.get('/api/search-key')
@@ -82,6 +56,10 @@ export default {
                 return this.search_meta.find(x => x.foreign_key === foreign_key).search_in;
             }
             return "";
+        },
+        remove_chip (item,list) {
+            let index = list.indexOf(item);
+            if (index >= 0) list.splice(index, 1)
         },
         loadThis(api, list, item, event){
             let value = '';
@@ -123,11 +101,31 @@ export default {
                 }
             });
             if(typeof multiples!=='undefined'){
+                this.multiples = multiples;
                 multiples.forEach((value)=>{
-                    axios.get(value.source)
-                        .then(response => {
-                            this[value.list] = response.data;
-                        });
+                    if(value.list === 'parent_list' || typeof value.preload!=='undefined'){
+                        axios.get(value.source)
+                            .then(response => {
+                                this[value.list] = response.data;
+                            });
+                    }else{
+                        this.$watch(value.list+'_search',
+                            _.debounce(function () {
+                                if(this[value.list+'_search']!=null && this[value.list+'_search'].length > 2){
+                                    axios.get(value.source,{
+                                        params: {
+                                            page:1,
+                                            per_page:5,
+                                            keyword: this[value.list+'_search'],
+                                            filter:{name:'name'}
+                                        },
+                                    }).then(response => {
+                                        this[value.list] = response.data.data;
+                                    })
+                                }
+                            }, 1000)
+                        );
+                    }
                 });
             }
             this.resource = resource;
@@ -143,6 +141,7 @@ export default {
             return new Promise((resolve, reject) => {
                 axios.get(this.resource,{
                     params: {
+                        parent_id:(this.parent_id ? this.parent_id: 0 ),
                         page:this.pagination.page,
                         per_page:this.pagination.rowsPerPage,
                         keyword: this.searchText,
@@ -168,6 +167,12 @@ export default {
         },
         editItem(item){
             this.item=JSON.parse(JSON.stringify(item));
+            //todo with ile gelenleri id listesine çevirmeli mi çevirmemeli mi?
+            this.multiples.forEach(value=>{
+                this[value.list] = _.union(this[value.list],this.item[value.list]);
+                if(typeof this.item[value.list] !== 'undefined')
+                    this.item[value.list] = this.item[value.list].map(x=>x.id)
+            });
             this.dialog=true;
         },
         deleteItem(item){
@@ -183,41 +188,55 @@ export default {
 
         },
         submit(){
-            if(typeof this.item.id === 'undefined' || this.item.id===0){
-                axios.post(this.resource,this.item)
-                    .then(response => {
-                        this.getItems()
-                            .then(data => {
-                                this.items = data.items;
-                                this.totalItems = data.total;
-                            })
-                        this.resetItem();
-                        this.dialog=false;
-                        this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_saved"),duration:3000});
+            this.$validator.validateAll().then(passes=> {
+                if (typeof this.item.id === 'undefined' || this.item.id === 0) {
+                    axios.post(this.resource, this.item)
+                        .then(response => {
+                            this.getItems()
+                                .then(data => {
+                                    this.items = data.items;
+                                    this.totalItems = data.total;
+                                })
+                            this.resetItem();
+                            this.dialog = false;
+                            this.$store.dispatch("setAllSnackbar", {
+                                snackbar: true,
+                                message: i18n.t("app.snackbar_saved"),
+                                duration: 3000
+                            });
+                        })
+                } else {
+                    axios({
+                        method: 'PUT',
+                        url: this.resource + '/' + this.item.id,
+                        data: this.item
                     })
-            }else{
-                axios({
-                    method: 'PUT',
-                    url: this.resource+'/'+this.item.id,
-                    data: this.item
-                })
-                    .then(response => {
-                        this.getItems()
-                            .then(data => {
-                                this.items = data.items;
-                                this.totalItems = data.total;
-                            })
-                        this.resetItem();
-                        this.dialog=false;
-                        this.$store.dispatch("setAllSnackbar",{snackbar:true,message:i18n.t("app.snackbar_updated"),duration:3000});
-                    })
-            }
+                        .then(response => {
+                            this.getItems()
+                                .then(data => {
+                                    this.items = data.items;
+                                    this.totalItems = data.total;
+                                })
+                            this.resetItem();
+                            this.dialog = false;
+                            this.$store.dispatch("setAllSnackbar", {
+                                snackbar: true,
+                                message: i18n.t("app.snackbar_updated"),
+                                duration: 3000
+                            });
+                        })
+                }
+            });
         },
         resetItem(){
             this.item=this.default_item
         },
         deleteConfirm(i){
             this.$refs.confirm.open(i)
+        },
+        setParent(id){
+            this.parent_id = id;
+            this.item.parent_id = id;
         }
     },
     computed: {
@@ -240,6 +259,16 @@ export default {
             });
         },
         pagination: {
+            handler () {
+                this.getItems()
+                    .then(data => {
+                        this.items = data.items;
+                        this.totalItems = data.total;
+                    })
+            },
+            deep: true
+        },
+        parent_id: {
             handler () {
                 this.getItems()
                     .then(data => {

@@ -29,6 +29,7 @@ class CodersServiceProvider extends ServiceProvider
                 __DIR__ . '/../../publish/views/admin.blade.php' => resource_path('views/admin.blade.php'),
                 __DIR__ . '/../../publish/lang/en/Component-form.php' => resource_path('lang/en/Component-form.php'),
                 __DIR__ . '/../../publish/lang/tr/Component-form.php' => resource_path('lang/tr/Component-form.php'),
+                __DIR__ . '/../../publish/app/Helper' => app_path('Helper.php'),
             ], 'gesirdek-models');
             //$this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 

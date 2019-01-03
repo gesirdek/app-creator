@@ -27,9 +27,15 @@ class RouteCreator{
         return File::get(base_path('routes/api.php'));
     }
     private static function getModuleRoute($studlymodulename){
-        return File::get(base_path('Modules/'.$studlymodulename.'/Routes/web.php'));
+        return File::get(base_path('Modules/'.$studlymodulename.'/Routes/api.php'));
     }
+    /*private static function getModuleWebRoute($studlymodulename){
+        return File::get(base_path('Modules/'.$studlymodulename.'/Routes/web.php'));
+    }*/
     private static function putModuleRoute($studlymodulename, $contents){
+        return File::put(base_path('Modules/'.$studlymodulename.'/Routes/api.php'), $contents);
+    }
+    private static function putModuleWebRoute($studlymodulename, $contents){
         return File::put(base_path('Modules/'.$studlymodulename.'/Routes/web.php'), $contents);
     }
     private static function putRouteApi($contents){
@@ -85,6 +91,7 @@ class RouteCreator{
     protected function createFile($modulename)
     {
         self::putModuleRoute(studly_case($modulename), $this->createModuleContents($modulename));
+        self::putModuleWebRoute(studly_case($modulename),"<?php"."\r\n");
 
         $contents = str_replace('/*{{modulus}}*/', "\t{ path: '/".studly_case($modulename)."', name: '".studly_case($modulename)."', component: ".studly_case($modulename).",
         children: [\n/*{{module_content_".$modulename."}}*/\n\t\t]},\n/*{{modulus}}*/", self::getRouteJs());
@@ -100,7 +107,7 @@ class RouteCreator{
     protected function createModuleContents($modulename)
     {
         $body = "<?php\n";
-        $body .= "Route::group(['prefix' => 'api/".$modulename."'], function()\n";
+        $body .= "Route::group(['prefix' => '".$modulename."'], function()\n";
         $body .= "{\n";
         $body .= "/*{{routebody}}*/\n";
         $body .= "});";

@@ -189,7 +189,7 @@ class Factory
         $this->files->put($this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'assets','js','components'],($moduleTitle == 'App' ? '' : $moduleTitle),'.vue'), $file);
 
         /*CREATE LANGUAGE PACKAGE*/
-        // todo create for each language from package config
+        // todo: create for each language from package config
         //$languageFileName = $this->modelPath($model, $model->usesBaseFiles() ? ['Base'] : [$base, ($moduleTitle == 'App' ? '' : $moduleTitle),($moduleTitle == 'App' ? 'resources' : 'Resources'),'lang', 'tr'],'Component-','.php');
         $languageFileName = $this->modelPathSmallCase($model, $model->usesBaseFiles() ? ['Base'] : ['resources','lang','tr'],'Component-'.strtolower($moduleTitle == 'App' ? '' : $moduleTitle),'.php');
         $languageFileName = $this->modelPathSmallCase($model, $model->usesBaseFiles() ? ['Base'] : ['resources','lang','en'],'Component-'.strtolower($moduleTitle == 'App' ? '' : $moduleTitle),'.php');
@@ -459,13 +459,13 @@ class Factory
                 }
             }
         }
-        $body .= "\t\t"."auto_complete_list:{";
+        /*$body .= "\t\t"."auto_complete_list:{";
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
                 $body.= $constraint->name().' : [],';
             }
         }
-        $body .= "},"."\r\n";
+        $body .= "},"."\r\n";*/
 
         return substr(substr($body,2),0,-2);
     }
@@ -480,9 +480,8 @@ class Factory
 
         foreach ($model->getRelations() as $constraint) {
             if(Str::contains($constraint->body(),'belongsToMany')){
-                $body.= "\t\t".$constraint->name().'_multiselect_ref : \'\','."\r\n";
-                $body.= "\t\t".$constraint->name().'_multiselect: \'\','."\r\n";
-                $body.= "\t\t".$constraint->name().'_display_list : [],'."\r\n";
+                $body.= "\t\t".$constraint->name().'_search : \'\','."\r\n";
+                $body.= "\t\t".$constraint->name().': [],'."\r\n";
             }
         }
 
@@ -584,31 +583,34 @@ class Factory
             if(Str::contains($constraint->body(),'belongsToMany')){
                 $constraintModule = strtolower(explode("\\",explode("|",$constraint->hint())[1])[2]);
                 $body .= "\t\t\t"."<v-autocomplete"."\r\n";
-                $body .= "\t\t\t\t"."v-model=\"".$constraint->name()."_multiselect\""."\r\n";
-                $body .= "\t\t\t\t".":ref=\"".$constraint->name()."_multiselect_ref\""."\r\n";
-                $body .= "\t\t\t\t"."@keyup=\"loadThis('/api/".$constraintModule."/".str_replace('_','-',str_singular($constraint->name()))."',auto_complete_list, '".$constraint->name()."', \$event)\""."\r\n";
-                $body .= "\t\t\t\t"."@change=\"createChip(auto_complete_list ,'".$constraint->name()."', 'name', item.".$constraint->name().", \$event, ".$constraint->name()."_multiselect_ref, auto_complete_list.".$constraint->name()."_display_list)\""."\r\n";
-                $body .= "\t\t\t\t".":items=\"auto_complete_list.".$constraint->name()."\""."\r\n";
-                $body .= "\t\t\t\t".":error-messages=\"errors.collect(\$t('".$vfilename.".".$constraint->name()."'))\""."\r\n";
-                $body .= "\t\t\t\t"."color=\"white\""."\r\n";
+                $body .= "\t\t\t\t".":items=\"".$constraint->name()."\""."\r\n";
+                $body .= "\t\t\t\t".":search-input.sync=\"".$constraint->name()."_search\""."\r\n";
+                $body .= "\t\t\t\t".':label="$t(\''.$vfilename.'.'.$constraint->name().'\')"'."\r\n";
+                $body .= "\t\t\t\t"."v-model=\"item.".$constraint->name()."\""."\r\n";
                 $body .= "\t\t\t\t"."item-text=\"name\""."\r\n";
                 $body .= "\t\t\t\t"."item-value=\"id\""."\r\n";
-                $body .= "\t\t\t\t"."clearable"."\r\n";
-                $body .= "\t\t\t\t".":label=\"\$t('".$vfilename.".".$constraint->name()."')\""."\r\n";
-                $body .= "\t\t\t\t"."placeholder=\"\$t('".$vfilename.".".$constraint->name()."')\">"."\r\n";
-                $body .= "\t\t\t\t"."</v-autocomplete>"."\r\n";
-                $body .= "\t\t\t\t"."<v-select"."\r\n";
-                $body .= "\t\t\t\t"."v-model=\"item.".$constraint->name()."\""."\r\n";
-                $body .= "\t\t\t\t".":items=\"auto_complete_list.".$constraint->name()."_display_list\""."\r\n";
-                $body .= "\t\t\t\t"."v-validate=\"'required'\""."\r\n";
-                $body .= "\t\t\t\t"."attach"."\r\n";
-                $body .= "\t\t\t\t"."chips"."\r\n";
-                $body .= "\t\t\t\t"."label=\"Chips\""."\r\n";
+                $body .= "\t\t\t\t"."class=\"mx-3\""."\r\n";
+                $body .= "\t\t\t\t"."flat"."\r\n";
+                $body .= "\t\t\t\t"."hide-no-data"."\r\n";
+                $body .= "\t\t\t\t"."hide-details"."\r\n";
+                $body .= "\t\t\t\t"."cache-items"."\r\n";
                 $body .= "\t\t\t\t"."multiple"."\r\n";
-                $body .= "\t\t\t\t"."></v-select>"."\r\n";
-                $body .= "\t\t\t\t"."<span>"."\r\n";
-                $body .= "\t\t\t\t"."<v-chip :key=\"r.id\" v-for=\"r in auto_complete_list.".$constraint->name()."_display_list\" close @input=\"removeChip(r, item.".$constraint->name().", auto_complete_list.".$constraint->name()."_display_list)\">{{ r.name }}</v-chip>"."\r\n";
-                $body .= "\t\t\t\t"."</span>"."\r\n";
+                $body .= "\t\t\t".">"."\r\n";
+                $body .= "
+                <template
+                          slot=\"selection\"
+                          slot-scope=\"data\"
+                  >
+                      <v-chip
+                              :selected=\"data.selected\"
+                              close
+                              class=\"chip--select-multi\"
+                              @input=\"remove_chip(data.item.id,item.".$constraint->name().")\"
+                      >
+                          {{ data.item.name }}
+                      </v-chip>
+                  </template>"."\r\n";
+                $body .= "\t\t\t"."</v-autocomplete>";
             }
         }
 
