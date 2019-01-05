@@ -155,4 +155,4 @@ to decide whether this approach gives value to your project :-)
 
 #### Support
 
-For the time being, this package supports Postgre database. MySQL model and schema is ready but never tested.
+For the time being, this package supports Postgre and MYSQL database.
