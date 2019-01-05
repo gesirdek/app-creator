@@ -15,7 +15,7 @@ composer require gesirdek/app-creator
 
 ### Configuration
 
-Add this to your package.json and run
+Run
 
 ```bash
 npm i
