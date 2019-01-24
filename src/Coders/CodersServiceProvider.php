@@ -24,7 +24,6 @@ class CodersServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../publish/config/models.php' => config_path('models.php'),
                 __DIR__ . '/../../publish/js/' => resource_path('assets/js'),
-                __DIR__ . '/../../publish/js/components' => resource_path('assets/js/components'),
                 __DIR__ . '/../../publish/base/.babelrc' => base_path('.babelrc'),
                 __DIR__ . '/../../publish/base/webpack.mix.js' => base_path('webpack.mix.js'),
                 __DIR__ . '/../../publish/views/admin.blade.php' => resource_path('views/admin.blade.php'),
