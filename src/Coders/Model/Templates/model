@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package {{namespacemodel}}
  */
-class {{class}} extends Model
+class {{class}} extends {{modelextension}}
 {
 {{body}}
 }

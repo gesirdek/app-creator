@@ -43,6 +43,17 @@ class CodersServiceProvider extends ServiceProvider
             //$this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
             //Artisan commands
+            //Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
+            echo 'extensions are downloading...'."\n";
+            exec('npm i');
+            exec('npm i');
+            exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync
+npm i -D babel-plugin-syntax-dynamic-import');
+            exec('composer require laravel/passport');
+            echo 'migration is being called...'."\n";
+            Artisan::call('migrate');
+            echo 'passport extension installing...'."\n";
+            Artisan::call('passport:install');
 
             $this->commands([
                 CodeModelsCommand::class,

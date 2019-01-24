@@ -307,6 +307,7 @@ class Factory
         $template = str_replace('{{updatemodel}}', $this->getUpdateModel($model), $template);
         $template = str_replace('{{storemodel}}', $this->getStoreModel($model), $template);
         $template = str_replace('{{properties}}', $this->properties($model), $template);
+        $template = str_replace('{{modelextension}}', $this->modelExtension($model), $template);
         $template = str_replace('{{class}}', $model->getClassName(), $template);
         $template = str_replace('{{body}}', $this->body($model), $template);
 
@@ -314,6 +315,17 @@ class Factory
 
 
         return $template;
+    }
+
+    protected function modelExtension($model)
+    {
+        if(config('models.*.user_management')){
+            if($model->getClassName() == 'User'){
+                return "Authenticatable";
+            }
+        }
+
+        return "Model";
     }
 
     protected function getModelFromTable($table)
@@ -416,6 +428,15 @@ class Factory
      */
     protected function getRelatedNamespaces(Model $model){
         $body = "";
+
+        if(config('models.*.user_management')){
+            if($model->getClassName() == 'User'){
+                $body.= "use Laravel\Passport\HasApiTokens;"."\n";
+                $body.= "use Illuminate\Foundation\Auth\User as Authenticatable;"."\n";
+                $body.= "use Illuminate\Notifications\Notifiable;"."\n";
+            }
+        }
+
         foreach ($model->getRelations() as $constraint) {
             if($model->getTable() == str_plural($constraint->name())){
                 continue;
@@ -887,6 +908,12 @@ class Factory
     protected function body(Model $model)
     {
         $body = '';
+
+        if(config('models.*.user_management')){
+            if($model->getClassName() == 'User'){
+                $body .= "\t"."use Notifiable, HasApiTokens;"."\n";
+            }
+        }
 
         foreach ($model->getTraits() as $trait) {
             $body .= $this->class->mixin($trait);
