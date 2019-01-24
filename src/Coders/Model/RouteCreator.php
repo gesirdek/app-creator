@@ -53,6 +53,8 @@ class RouteCreator{
             Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
         }
 
+        //Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
+
         $this->createMainApiRoutes();
         $this->createRoutesJs();
 

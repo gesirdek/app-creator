@@ -18,7 +18,12 @@ class Schema implements \Gesirdek\Meta\Schema
     /**
      * @var string
      */
-    protected $schema;
+    protected $database;
+
+    /**
+     * @var string
+     */
+    //protected $schema;
 
     /**
      * @var \Illuminate\Database\PostgresConnection
@@ -51,9 +56,10 @@ class Schema implements \Gesirdek\Meta\Schema
      * @param string $schema
      * @param \Illuminate\Database\PostgresConnection $connection
      */
-    public function __construct($schema, $connection, $config)
+    public function __construct($database, $schema, $connection, $config)
     {
-        $this->schema = $schema;
+        $this->database = $database;
+        $this->schema =  $schema;
         $this->connection = $connection;
         $this->config = $config;
 
@@ -74,10 +80,10 @@ class Schema implements \Gesirdek\Meta\Schema
      */
     protected function load()
     {
-        $tables = array_diff($this->fetchTables('public'),  $this->config->getKey('except'));
+        $tables = array_diff($this->fetchTables($this->schema),  $this->config->getKey('except'));
         $extras = [];
         foreach ($tables as $table) {
-            $extras = explode(";", $this->fetchTableComments('public', $table));
+            $extras = explode(";", $this->fetchTableComments($this->schema, $table));
             $moduleName = "";
             if (is_array($extras) && !empty($extras)) {
                 $moduleName = $extras[0];
@@ -93,7 +99,7 @@ class Schema implements \Gesirdek\Meta\Schema
         new RouteCreator($this->moduleNames);
 
         foreach ($tables as $table) {
-            $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, explode(";", $this->fetchTableComments('public', $table)));
+            $blueprint = new Blueprint($this->connection->getName(), $this->database, $table, explode(";", $this->fetchTableComments($this->schema, $table)));
             RouteCreator::addContent($blueprint);
             $this->fillColumns($blueprint);
             $this->fillConstraints($blueprint);
@@ -203,7 +209,7 @@ WHERE c.relkind = \'r\'::char
         $tableComments = array();
 
 
-        $tableComments = explode(';',$this->fetchTableComments('public',$blueprint->table()));
+        $tableComments = explode(';',$this->fetchTableComments($this->schema,$blueprint->table()));
         if(isset($tableComments[1])){
             if($tableComments[1] != null && $tableComments[1] != ''){
                 //$morphToTable = explode(',', explode('|', $tableComments[1])[0]);

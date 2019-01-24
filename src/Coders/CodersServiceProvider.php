@@ -24,14 +24,26 @@ class CodersServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../publish/config/models.php' => config_path('models.php'),
                 __DIR__ . '/../../publish/js/' => resource_path('assets/js'),
+                __DIR__ . '/../../publish/js/components' => resource_path('assets/js/components'),
                 __DIR__ . '/../../publish/base/.babelrc' => base_path('.babelrc'),
                 __DIR__ . '/../../publish/base/webpack.mix.js' => base_path('webpack.mix.js'),
                 __DIR__ . '/../../publish/views/admin.blade.php' => resource_path('views/admin.blade.php'),
                 __DIR__ . '/../../publish/lang/en/Component-form.php' => resource_path('lang/en/Component-form.php'),
                 __DIR__ . '/../../publish/lang/tr/Component-form.php' => resource_path('lang/tr/Component-form.php'),
                 __DIR__ . '/../../publish/app/Helper' => app_path('Helper.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/CheckForMaintenanceMode' => app_path('Http/Middleware/CheckForMaintenanceMode.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/CheckIpChangeMiddleware' => app_path('Http/Middleware/CheckIpChangeMiddleware.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/EncryptCookies' => app_path('Http/Middleware/EncryptCookies.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/LanguageMiddleware' => app_path('Http/Middleware/LanguageMiddleware.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/RedirectIfAuthenticated' => app_path('Http/Middleware/RedirectIfAuthenticated.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/RoleChecker' => app_path('Http/Middleware/RoleChecker.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/TrimStrings' => app_path('Http/Middleware/TrimStrings.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/TrustProxies' => app_path('Http/Middleware/TrustProxies.php'),
+                __DIR__ . '/../../publish/app/Http/Middleware/VerifyCsrfToken' => app_path('Http/Middleware/VerifyCsrfToken.php'),
             ], 'gesirdek-models');
             //$this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
+            //Artisan commands
 
             $this->commands([
                 CodeModelsCommand::class,

@@ -99,6 +99,10 @@ class SchemaManager implements IteratorAggregate
     {
         $mapper = $this->getMapper();
 
+        if (strpos(static::$lookup[$this->type()], '\\PgSql\\') !== false) {
+            return new $mapper($schema, 'public', $this->connection, $this->config);
+        }
+
         return new $mapper($schema, $this->connection, $this->config);
     }
 
