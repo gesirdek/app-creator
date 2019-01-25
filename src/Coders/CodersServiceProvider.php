@@ -31,6 +31,7 @@ class CodersServiceProvider extends ServiceProvider
                 __DIR__ . '/../../publish/lang/en/Component-form.php' => resource_path('lang/en/Component-form.php'),
                 __DIR__ . '/../../publish/lang/tr/Component-form.php' => resource_path('lang/tr/Component-form.php'),
                 __DIR__ . '/../../publish/app/Helper' => app_path('Helper.php'),
+                __DIR__ . '/../../publish/app/Http/Kernel' => app_path('Http/Kernel.php'),
                 __DIR__ . '/../../publish/app/Http/Middleware/CheckForMaintenanceMode' => app_path('Http/Middleware/CheckForMaintenanceMode.php'),
                 __DIR__ . '/../../publish/app/Http/Middleware/CheckIpChangeMiddleware' => app_path('Http/Middleware/CheckIpChangeMiddleware.php'),
                 __DIR__ . '/../../publish/app/Http/Middleware/EncryptCookies' => app_path('Http/Middleware/EncryptCookies.php'),
@@ -42,7 +43,7 @@ class CodersServiceProvider extends ServiceProvider
                 __DIR__ . '/../../publish/app/Http/Middleware/VerifyCsrfToken' => app_path('Http/Middleware/VerifyCsrfToken.php'),
             ], 'gesirdek-models');
             //$this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
-            
+
             $this->commands([
                 CodeModelsCommand::class,
             ]);
