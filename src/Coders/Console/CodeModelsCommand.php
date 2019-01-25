@@ -60,12 +60,30 @@ class CodeModelsCommand extends Command
     {
         /*$this->createPermissions();
         exit;*/
+        echo 'requirements are installing...'."\n";
+        exec('npm i');
+        exec('npm i');
+        exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync
+npm i -D babel-plugin-syntax-dynamic-import');
+
         if(config('models.*.user_management')){
+            //Artisan commands
+            //Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
+            echo 'extensions are downloading...'."\n";
+            shell_exec('composer require laravel/passport');
+            echo 'migration is being called...'."\n";
+            Artisan::call('migrate');
+            echo 'passport extension installing...'."\n";
+            Artisan::call('passport:install');
+            echo 'user management tables are installing...'."\n";
             Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
+            echo 'application is being created...'."\n";
         }
+
         $connection = $this->getConnection();
         $schema = $this->getSchema($connection);
         $table = $this->getTable();
+
 
         // Check whether we just need to generate one table
         if ($table) {
@@ -78,6 +96,7 @@ class CodeModelsCommand extends Command
             $this->models->on($connection, $schema)->map($schema);
             $this->info("Check out your models for $schema");
         }
+
         if(config('models.*.user_management')){
             $this->createPermissions();
         }

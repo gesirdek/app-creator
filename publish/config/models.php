@@ -282,7 +282,11 @@ return [
         'except' => [
             'migrations',
             'password_resets',
-            'permissions'
+            'oauth_auth_codes',
+            'oauth_access_tokens',
+            'oauth_refresh_tokens',
+            'oauth_clients',
+            'oauth_personal_access_clients'
         ],
 
         /*
