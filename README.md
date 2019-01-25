@@ -14,15 +14,6 @@ composer require gesirdek/app-creator
 ```
 
 ### Configuration
-
-Run
-
-```bash
-npm i
-npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync
-npm i -D babel-plugin-syntax-dynamic-import
-```  
-
 Add the service provider to your `config/app.php` file within the `providers` key:
 
 ```php
