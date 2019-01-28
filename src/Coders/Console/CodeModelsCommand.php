@@ -65,6 +65,7 @@ class CodeModelsCommand extends Command
         exec('npm i');
         exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync
 npm i -D babel-plugin-syntax-dynamic-import');
+        //exec('npm i --save-dev babel-loader sass-loader vue-loader');
 
         if(config('models.*.user_management')){
             //Artisan commands

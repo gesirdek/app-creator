@@ -39,12 +39,5 @@
     },
     "config": {
         "preferred-install": "dist"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Gesirdek\\Coders\\CodersServiceProvider"
-            ]
-        }
     }
 }
