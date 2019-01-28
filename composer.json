@@ -28,8 +28,8 @@
         "phpunit/phpunit": "~5.0"
     },
     "autoload": {
-        "psr-0": {
-            "Gesirdek\\Coders": "src/Coders"
+        "psr-4": {
+            "Gesirdek\\": "src/"
         }
     },
     "autoload-dev": {
