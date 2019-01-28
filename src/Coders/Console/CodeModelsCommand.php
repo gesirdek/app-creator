@@ -68,7 +68,9 @@ class CodeModelsCommand extends Command
         if(config('models.*.user_management')){
             //Artisan commands
             //Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
-            $this->line('migration is being called...');
+            $this->line('passport package is downloading...');
+            exec('composer require laravel/passport');
+            $this->line('migrations...');
             Artisan::call('migrate');
             $this->line('passport extension installing...');
             Artisan::call('passport:install');
