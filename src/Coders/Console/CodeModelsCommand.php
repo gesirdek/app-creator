@@ -60,22 +60,39 @@ class CodeModelsCommand extends Command
     {
         /*$this->createPermissions();
         exit;*/
-        $this->line('requirements are installing...');
-        exec('npm i');
-        exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync');
-        exec('npm i -D babel-plugin-syntax-dynamic-import babel-loader sass-loader vue-loader');
+        if(function_exists('exec')) {
+            $this->line('requirements are installing...');
+            exec('npm i');
+            exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync');
+            exec('npm i -D babel-plugin-syntax-dynamic-import babel-loader sass-loader vue-loader');
+        }else{
+            $this->line('exec function is disabled. please run below commands manually');
+
+            $this->line('npm i');
+            $this->line('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync');
+            $this->line('npm i -D babel-plugin-syntax-dynamic-import babel-loader sass-loader vue-loader');
+        }
+
 
         if(config('models.*.user_management')){
             //Artisan commands
             //Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
-            $this->line('passport package is downloading...');
-            exec('composer require laravel/passport');
-            $this->line('migrations...');
-            Artisan::call('migrate');
-            $this->line('passport extension installing...');
-            Artisan::call('passport:install');
-            $this->line('user management tables are installing...');
-            Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
+            if(function_exists('exec')){
+                $this->line('passport package is downloading...');
+                exec('composer require laravel/passport');
+                $this->line('migrations...');
+                Artisan::call('migrate');
+                $this->line('passport extension installing...');
+                Artisan::call('passport:install');
+                $this->line('user management tables are installing...');
+                Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
+            }else{
+                $this->line('exec function is disabled. please run below commands manually');
+                $this->line('php artisan migrate');
+                $this->line('php artisan passport:install');
+                $this->line('php artisan migrate --path=vendor/gesirdek/app-creator/src/Database/Migrations');
+
+            }
             $this->line('application is being created...');
         }
 
