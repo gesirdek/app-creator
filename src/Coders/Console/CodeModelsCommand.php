@@ -60,25 +60,21 @@ class CodeModelsCommand extends Command
     {
         /*$this->createPermissions();
         exit;*/
-        echo 'requirements are installing...'."\n";
+        $this->line('requirements are installing...');
         exec('npm i');
-        exec('npm i');
-        exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync
-npm i -D babel-plugin-syntax-dynamic-import');
-        //exec('npm i --save-dev babel-loader sass-loader vue-loader');
+        exec('npm i -S font-awesome js-cookie sweetalert2 vee-validate material-design-icons material-icons vue-i18n vue-router vue-timeago vuetify vuex vuex-router-sync');
+        exec('npm i -D babel-plugin-syntax-dynamic-import babel-loader sass-loader vue-loader');
 
         if(config('models.*.user_management')){
             //Artisan commands
             //Artisan::call('module:make', ['name' => [studly_case($moduleName)]]);
-            echo 'extensions are downloading...'."\n";
-            shell_exec('composer require laravel/passport');
-            echo 'migration is being called...'."\n";
+            $this->line('migration is being called...');
             Artisan::call('migrate');
-            echo 'passport extension installing...'."\n";
+            $this->line('passport extension installing...');
             Artisan::call('passport:install');
-            echo 'user management tables are installing...'."\n";
+            $this->line('user management tables are installing...');
             Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
-            echo 'application is being created...'."\n";
+            $this->line('application is being created...');
         }
 
         $connection = $this->getConnection();
