@@ -80,6 +80,7 @@ class CodeModelsCommand extends Command
             if(function_exists('exec')){
                 $this->line('passport package is downloading...');
                 exec('composer require laravel/passport');
+                exec('composer dump-autoload');
                 $this->line('migrations...');
                 Artisan::call('migrate');
                 $this->line('passport extension installing...');
@@ -88,6 +89,8 @@ class CodeModelsCommand extends Command
                 Artisan::call('migrate', ['--path' => 'vendor/gesirdek/app-creator/src/Database/Migrations']);
             }else{
                 $this->line('exec function is disabled. please run below commands manually');
+                $this->line('composer require laravel/passport');
+                $this->line('composer dump-autoload');
                 $this->line('php artisan migrate');
                 $this->line('php artisan passport:install');
                 $this->line('php artisan migrate --path=vendor/gesirdek/app-creator/src/Database/Migrations');

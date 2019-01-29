@@ -31,6 +31,8 @@ class CodersServiceProvider extends ServiceProvider
                 __DIR__ . '/../../publish/views/auth/login.blade' => resource_path('views/auth/login.blade.php'),
                 __DIR__ . '/../../publish/routes/web' => base_path('routes/web.php'),
                 __DIR__ . '/../../publish/public/js/login' => base_path('public/js/login.js'),
+                __DIR__ . '/../../publish/public/css/material-icons.min.css' => base_path('public/css/material-icons.min.css'),
+                __DIR__ . '/../../publish/public/css/vuetify.css' => base_path('public/css/vuetify.css'),
                 __DIR__ . '/../../publish/lang/en/Component-form.php' => resource_path('lang/en/Component-form.php'),
                 __DIR__ . '/../../publish/lang/tr/Component-form.php' => resource_path('lang/tr/Component-form.php'),
                 __DIR__ . '/../../publish/app/Helper' => app_path('Helper.php'),
