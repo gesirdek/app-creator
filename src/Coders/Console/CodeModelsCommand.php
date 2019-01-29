@@ -81,6 +81,7 @@ class CodeModelsCommand extends Command
                 $this->line('passport package is downloading...');
                 exec('composer require laravel/passport');
                 exec('composer dump-autoload');
+                Artisan::call('vendor:publish', ['--tag' => 'passport-migrations']);
                 $this->line('migrations...');
                 Artisan::call('migrate');
                 $this->line('passport extension installing...');

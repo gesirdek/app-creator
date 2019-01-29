@@ -27,6 +27,7 @@ class UpdateUsersTable extends Migration
 
         DB::table('users')->insert(
             array(
+                'id' => 1,
                 'name' => 'Admin',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('123456'),
